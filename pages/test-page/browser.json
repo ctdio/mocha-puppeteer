@@ -1,0 +1,10 @@
+{
+  "dependencies": [
+    "mocha/mocha.css",
+    "mocha/mocha.js",
+    "superagent/superagent.js",
+    "require-run: ./setup",
+    "require-run: ./test.js",
+    "require-run: ./run-tests"
+  ]
+}
