@@ -3,12 +3,16 @@
   "version": "0.0.1",
   "description": "Run tests in headless chrome",
   "main": "index.js",
+  "bin": {
+    "mocha-puppeteer": "./bin/mocha-puppeteer"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Charlie Duong",
   "license": "MIT",
   "dependencies": {
+    "glob": "^7.1.2",
     "koa": "^2.3.0",
     "koa-bodyparser": "^4.2.0",
     "koa-mount": "^3.0.0",
