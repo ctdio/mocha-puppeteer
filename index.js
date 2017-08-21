@@ -5,12 +5,12 @@ exports.runTests = async function (options) {
     const runner = new TestRunner(options)
 
     runner.once('complete', ({ testsPassed }) => {
-      testsPassed ? resolve() : reject()
+      testsPassed ? resolve() : reject(new Error('Tests failed'))
     })
 
     runner.once('error', (error) => {
       console.error('Error occured while running tests', error)
-      reject(err)
+      reject(error)
     })
 
     runner.start()

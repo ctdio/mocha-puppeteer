@@ -40,7 +40,7 @@ class TestRunner extends EventEmitter {
 
     const staticDir = `${process.cwd()}/.mocha-puppeteer`
 
-    const app = this._app = new Koa();
+    const app = this._app = new Koa()
     const router = new Router({
       middleware: [ bodyParser() ]
     })
@@ -64,7 +64,7 @@ class TestRunner extends EventEmitter {
         // inject test files
         ...testFiles,
 
-        `require-run: ${require.resolve('./pages/test-page/run-tests')}`,
+        `require-run: ${require.resolve('./pages/test-page/run-tests')}`
       ]
 
       ctx.body = testPageTemplate.stream({
