@@ -9,6 +9,7 @@ require('lasso/browser-refresh').enable('*.marko *.css *.less')
 
 const puppeteer = require('puppeteer')
 
+const http = require('http')
 const EventEmitter = require('events')
 const path = require('path')
 
@@ -74,8 +75,10 @@ class TestRunner extends EventEmitter {
     })
 
     router.post('/end-test', async (ctx) => {
+      console.log('Tearing down test server...')
       this._server.close()
       this._browser && this._browser.close()
+      console.log('Done!')
 
       const { errorMsg, testsPassed } = ctx.request.body
 
@@ -94,7 +97,11 @@ class TestRunner extends EventEmitter {
 
   start () {
     return new Promise((resolve, reject) => {
-      this._server = this._app.listen(8000, async () => {
+      this._server = http.createServer(this._app.callback()).listen(async () => {
+        const port = this._server.address().port
+
+        console.log(`Test server is listening on http://localhost:${port}...`)
+
         const browser = this._browser = await puppeteer.launch()
         const page = await browser.newPage()
 
@@ -102,7 +109,7 @@ class TestRunner extends EventEmitter {
           console.log(...args)
         })
 
-        await page.goto('http://localhost:8000')
+        await page.goto(`http://localhost:${port}`)
       })
     })
   }
