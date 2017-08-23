@@ -26,6 +26,8 @@ const glob = require('glob')
 
 const testPageTemplate = marko.load(require('./pages/test-page'))
 
+const { Server: WebSocketServer } = require('ws')
+
 class TestRunner extends EventEmitter {
   constructor (options = {}) {
     super()
@@ -97,10 +99,21 @@ class TestRunner extends EventEmitter {
 
   start () {
     return new Promise((resolve, reject) => {
-      this._server = http.createServer(this._app.callback()).listen(async () => {
+      const httpServer = this._server = http.createServer(this._app.callback()).listen(async () => {
         const port = this._server.address().port
 
         console.log(`Test server is listening on http://localhost:${port}...`)
+
+        const webSocketServer = new WebSocketServer({
+          server: httpServer,
+          path: '/ws'
+        })
+
+        webSocketServer.on('connection', (client) => {
+          client.on('message', (message) => {
+            process.stdout.write(message)
+          })
+        })
 
         const browser = this._browser = await puppeteer.launch()
         const page = await browser.newPage()

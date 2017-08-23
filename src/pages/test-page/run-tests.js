@@ -1,21 +1,48 @@
-const runner = window.mocha.run()
+// TODO: make these configurable
+const { Mocha, WebSocket, superagent, location } = window
+const { hostname, port } = location
 
-let testsPassed = true
+const socket = new WebSocket(`ws://${hostname}:${port}/ws`)
 
-const testTimeout = setTimeout(async () => {
-  await window.superagent.post('/end-test')
-    .send({ errorMsg: 'No tests detected' })
-}, 1000)
+socket.addEventListener('open', () => {
+  // patch stdout to send strings written to stdout
+  // to server for output
+  Mocha.process.stdout.write = function (str) {
+    socket.send(str)
+  }
 
-runner.once('fail', () => {
-  testsPassed = false
-})
+  // patch console log to create newline when no args are supplied
+  // (console logs are forwarded to server)
+  const oldConsoleLog = console.log
+  console.log = function (...args) {
+    if (args.length === 0) {
+      oldConsoleLog('')
+    } else {
+      oldConsoleLog(...args)
+    }
+  }
 
-runner.on('start', () => {
-  clearTimeout(testTimeout)
-})
+  const runner = window.mocha.run()
 
-runner.on('end', async (event) => {
-  await window.superagent.post('/end-test')
-    .send({ testsPassed })
+  let testsPassed = true
+
+  const testTimeout = setTimeout(async () => {
+    // TODO: send this over ws, fallback to http post if ws fails
+    await superagent.post('/end-test')
+      .send({ errorMsg: 'No tests detected' })
+  }, 1000)
+
+  runner.once('fail', () => {
+    testsPassed = false
+  })
+
+  runner.on('start', () => {
+    clearTimeout(testTimeout)
+  })
+
+  runner.on('end', async (event) => {
+    // TODO: send this over ws, fallback to http post if ws fails
+    await superagent.post('/end-test')
+      .send({ testsPassed })
+  })
 })

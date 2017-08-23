@@ -1,6 +1,7 @@
-// TODO: make these configurable
+// TODO: Make these options configurable
 
-window.mocha.setup('bdd')
-window.mocha.reporter('spec')
+const { mocha } = window
 
-window.mocha.useColors(true)
+mocha.setup('bdd')
+mocha.reporter('spec')
+mocha.useColors(true)
