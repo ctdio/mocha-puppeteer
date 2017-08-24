@@ -97,10 +97,10 @@ class TestRunner extends EventEmitter {
     app.use(mount('/static', serve(staticDir)))
   }
 
-  start () {
+  async start () {
     return new Promise((resolve, reject) => {
       const httpServer = this._server = http.createServer(this._app.callback()).listen(async () => {
-        const port = this._server.address().port
+        const { port } = this._server.address()
 
         console.log(`Test server is listening on http://localhost:${port}...`)
 
@@ -115,14 +115,16 @@ class TestRunner extends EventEmitter {
           })
         })
 
-        const browser = this._browser = await puppeteer.launch()
-        const page = await browser.newPage()
+        try {
+          const browser = this._browser = await puppeteer.launch()
+          const page = await browser.newPage()
 
-        page.on('console', (...args) => {
-          console.log(...args)
-        })
+          await page.goto(`http://localhost:${port}`)
+        } catch (err) {
+          reject(err)
+        }
 
-        await page.goto(`http://localhost:${port}`)
+        resolve()
       })
     })
   }

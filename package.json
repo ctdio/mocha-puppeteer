@@ -9,7 +9,9 @@
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "nyc ava test/unit test/integration",
+    "test:unit": "nyc ava test/unit",
+    "test:integration": "nyc ava test/integration"
   },
   "author": "Charlie Duong",
   "license": "MIT",
@@ -27,6 +29,7 @@
     "superagent": "^3.6.0"
   },
   "devDependencies": {
+    "ava": "^0.22.0",
     "eslint": "^4.5.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-config-standard-plus": "0.0.1",
@@ -34,6 +37,10 @@
     "eslint-plugin-node": "^5.1.1",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
-    "git-hooks": "^1.1.8"
+    "git-hooks": "^1.1.8",
+    "nyc": "^11.1.0",
+    "proxyquire": "^1.8.0",
+    "require-self-ref": "^2.0.1",
+    "sinon": "^3.2.1"
   }
 }

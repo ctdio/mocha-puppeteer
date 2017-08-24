@@ -5,3 +5,6 @@ static/
 .mocha-puppeteer/
 
 *.marko.js
+
+.nyc_output/
+coverage/
