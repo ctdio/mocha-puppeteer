@@ -1,15 +1,12 @@
 # mocha-puppeteer
 
-Welcome to mocha-puppeteer! Since Google Chrome enabled headless mode in 59.x, the Chrome DevTools team has developed
-[puppeteer](https://github.com/GoogleChrome/puppeteer) for running and managing an instance of Chromium. 
-Mocha-puppeteer makes it possible to read tests written in
-[Mocha](https://github.com/mochajs/mocha) and run them inside of a Chromium instance provided by puppeteer.
-This way you get the ease-of-use and familiarity of Mocha along with the reliable performance of Chromium.
+Since the release of Google Chrome headless mode, the Chrome DevTools team has developed
+[puppeteer](https://github.com/GoogleChrome/puppeteer) for running and managing an instance of Chromium.
+This module makes it possible to run tests written with
+[mocha](https://github.com/mochajs/mocha) inside of a Chromium instance.
 
 
 *Note:* Still under dev. Nothing is really configurable right now. Come back later.
-
-
 
 ## Installation
 
@@ -17,10 +14,17 @@ This way you get the ease-of-use and familiarity of Mocha along with the reliabl
 npm i -D mocha-puppeteer
 ```
 
-# Usage
+## Usage
 
 To run your tests, you can pass a glob to the exposed cli tool.
 
 ```
 npx mocha-puppeteer ./tests/**/*.js
 ```
+
+## Contributing
+
+If you find a bug or have an idea about how to improve the module, please create an issue. If you have a fix
+for a bug, feel free to submit a pull request.
+
+You can run tests with the `npm test` command.
