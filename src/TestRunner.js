@@ -91,6 +91,9 @@ class TestRunner extends EventEmitter {
           testsPassed
         })
       }
+
+      // return empty response as ack
+      ctx.body = {}
     })
 
     app.use(router.getRequestHandler())
