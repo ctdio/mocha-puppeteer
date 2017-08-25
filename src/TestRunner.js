@@ -46,7 +46,7 @@ const DEFAULT_LASSO_CONFIG = {
         transform: 'lasso-babel-transform',
         config: {
           babelOptions: {
-            plugins: [ 'istanbul' ]
+            plugins: [ require.resolve('babel-plugin-istanbul') ]
           }
         }
       }
