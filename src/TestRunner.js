@@ -35,7 +35,6 @@ class TestRunner extends EventEmitter {
     const { testsGlob } = options
 
     const files = glob.sync(testsGlob)
-    console.log(testsGlob)
 
     const testFiles = files.map((file) => {
       return `require-run: ${path.resolve(file)}`
@@ -104,23 +103,33 @@ class TestRunner extends EventEmitter {
     return new Promise((resolve, reject) => {
       const httpServer = this._server = http.createServer(this._app.callback()).listen(async () => {
         const { port } = this._server.address()
+        const columns = process.stdout.columns
 
         console.log(`Test server is listening on http://localhost:${port}...`)
 
+        // webSockets are used to send stdout and console logs to server in order
         const webSocketServer = new WebSocketServer({
           server: httpServer,
           path: '/ws'
         })
 
         webSocketServer.on('connection', (client) => {
-          client.on('message', (message) => {
-            process.stdout.write(message)
+          client.on('message', (rawMessage) => {
+            const { type, data } = JSON.parse(rawMessage)
+            if (type === 'stdout') {
+              process.stdout.write(data)
+            } else {
+              console.log(...data)
+            }
           })
         })
 
         try {
           const browser = this._browser = await puppeteer.launch()
           const page = await browser.newPage()
+
+          // set viewport width and height
+          page.setViewport({ width: columns, height: columns })
 
           await page.goto(`http://localhost:${port}`)
         } catch (err) {

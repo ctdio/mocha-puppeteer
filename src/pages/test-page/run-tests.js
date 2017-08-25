@@ -6,20 +6,19 @@ const socket = new WebSocket(`ws://${hostname}:${port}/ws`)
 
 socket.addEventListener('open', () => {
   // patch stdout to send strings written to stdout
-  // to server for output
-  Mocha.process.stdout.write = function (str) {
-    socket.send(str)
+  Mocha.process.stdout.write = function (data) {
+    socket.send(JSON.stringify({
+      type: 'stdout',
+      data
+    }))
   }
 
-  // patch console log to create newline when no args are supplied
-  // (console logs are forwarded to server)
-  const oldConsoleLog = console.log
+  // patch console log to send logs
   console.log = function (...args) {
-    if (args.length === 0) {
-      oldConsoleLog('')
-    } else {
-      oldConsoleLog(...args)
-    }
+    socket.send(JSON.stringify({
+      type: 'console',
+      data: args
+    }))
   }
 
   const runner = window.mocha.run()
