@@ -1,6 +1,11 @@
-// TODO: make these configurable
 const { Mocha, WebSocket, superagent, location } = window
 const { hostname, port } = location
+
+// end test if not started within one second
+const testTimeout = setTimeout(async () => {
+  await superagent.post('/end-test')
+    .send({ errorMsg: 'No tests detected' })
+}, 1000)
 
 const socket = new WebSocket(`ws://${hostname}:${port}/ws`)
 
@@ -14,34 +19,33 @@ socket.addEventListener('open', () => {
   }
 
   // patch console log to send logs
+  const oldConsoleLog = console.log
   console.log = function (...args) {
     socket.send(JSON.stringify({
       type: 'console',
       data: args
     }))
+    oldConsoleLog(...args)
   }
 
   const runner = window.mocha.run()
 
   let testsPassed = true
 
-  const testTimeout = setTimeout(async () => {
-    // TODO: send this over ws, fallback to http post if ws fails
-    await superagent.post('/end-test')
-      .send({ errorMsg: 'No tests detected' })
-  }, 1000)
-
   runner.once('fail', () => {
     testsPassed = false
   })
 
-  runner.on('start', () => {
+  runner.once('start', () => {
     clearTimeout(testTimeout)
   })
 
-  runner.on('end', async (event) => {
-    // TODO: send this over ws, fallback to http post if ws fails
+  runner.once('end', async (event) => {
     await superagent.post('/end-test')
-      .send({ testsPassed })
+      .send({
+        testsPassed,
+        // pass coverage back to server
+        coverage: window.__coverage__
+      })
   })
 })

@@ -16,6 +16,7 @@
   "author": "Charlie Duong",
   "license": "MIT",
   "dependencies": {
+    "babel-plugin-istanbul": "^4.1.4",
     "glob": "^7.1.2",
     "koa": "^2.3.0",
     "koa-bodyparser": "^4.2.0",
@@ -23,6 +24,7 @@
     "koa-path-router": "^0.1.1",
     "koa-static": "^4.0.1",
     "lasso": "^2.11.16",
+    "lasso-babel-transform": "^1.0.1",
     "marko": "^4.4.26",
     "mocha": "^3.5.0",
     "puppeteer": "^0.9.0",
