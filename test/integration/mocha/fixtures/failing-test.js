@@ -1,5 +1,5 @@
 describe('failing test', () => {
-  it('should pass this test', () => {
+  it('should fail this test', () => {
     throw new Error('Failing this test')
   })
 })
