@@ -64,16 +64,20 @@ class TestRunner extends EventEmitter {
 
     const {
       testFiles,
-      _testMode
+      _instrumentCode
     } = options
 
     assert(Array.isArray(testFiles), 'testFiles must be provided as an array')
 
     const outputDir = `./.mocha-puppeteer-${uuid.v4()}`
 
+    const instrumentCode = _instrumentCode === undefined
+      ? !!process.env.NYC_CONFIG
+      : !!_instrumentCode
+
     const baseLassoConfig = Object.assign({ outputDir },
       DEFAULT_LASSO_CONFIG,
-      !!process.env.NYC_CONFIG && ISTANBUL_LASSO_CONFIG_ADDON)
+      instrumentCode && ISTANBUL_LASSO_CONFIG_ADDON)
 
     const tests = testFiles.map((file) => `require-run: ${path.resolve(file)}`)
 
@@ -120,7 +124,7 @@ class TestRunner extends EventEmitter {
         coverageReport
       } = ctx.request.body
 
-      if (!_testMode && coverageReport) {
+      if (coverageReport) {
         // write to nyc temp dir so that coverage can be collected
         try {
           await mkdirAsync('./.nyc_output')

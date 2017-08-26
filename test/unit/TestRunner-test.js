@@ -178,14 +178,18 @@ test('should call fs.mkdir and fs.writeFile upon completing a test if ' +
     fs: mockFs
   })
 
-  const testRunner = new TestRunner({ testFiles: [] })
+  const testRunner = new TestRunner({
+    testFiles: [],
+    _instrumentCode: true
+  })
+
   await testRunner.start()
 
   const testCompletePromise = waitForEvent(testRunner, 'complete')
 
   await _sendTestEndRequest(testRunner, {
     testsPassed: true,
-    coverage: testCoverage
+    coverageReport: testCoverage
   })
 
   await testCompletePromise
@@ -215,7 +219,10 @@ test('should not call fs.mkdir and fs.writeFile upon completing a test if ' +
     fs: mockFs
   })
 
-  const testRunner = new TestRunner({ testFiles: [] })
+  const testRunner = new TestRunner({
+    testFiles: [],
+    _instrumentCode: false
+  })
   await testRunner.start()
 
   const testCompletePromise = waitForEvent(testRunner, 'complete')
