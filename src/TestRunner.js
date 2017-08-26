@@ -36,9 +36,10 @@ const rimrafAsync = promisify(require('rimraf'))
 const DEFAULT_LASSO_CONFIG = {
   minify: false,
   bundlingEnabled: false,
-  fingerprintsEnabled: false,
+  fingerprintsEnabled: false
+}
 
-  // add instrumentation
+const ISTANBUL_LASSO_CONFIG_ADDON = {
   require: {
     transforms: [
       {
@@ -61,12 +62,18 @@ class TestRunner extends EventEmitter {
     this._server = null
     this._browser = null
 
-    const { testFiles } = options
+    const {
+      testFiles,
+      _testMode
+    } = options
+
     assert(Array.isArray(testFiles), 'testFiles must be provided as an array')
 
     const outputDir = `./.mocha-puppeteer-${uuid.v4()}`
 
-    const baseLassoConfig = Object.assign({ outputDir }, DEFAULT_LASSO_CONFIG)
+    const baseLassoConfig = Object.assign({ outputDir },
+      DEFAULT_LASSO_CONFIG,
+      !!process.env.NYC_CONFIG && ISTANBUL_LASSO_CONFIG_ADDON)
 
     const tests = testFiles.map((file) => `require-run: ${path.resolve(file)}`)
 
@@ -110,10 +117,10 @@ class TestRunner extends EventEmitter {
       const {
         errorMsg,
         testsPassed,
-        coverage
+        coverageReport
       } = ctx.request.body
 
-      if (coverage) {
+      if (!_testMode && coverageReport) {
         // write to nyc temp dir so that coverage can be collected
         try {
           await mkdirAsync('./.nyc_output')
@@ -124,7 +131,7 @@ class TestRunner extends EventEmitter {
           }
         }
 
-        await writeFileAsync('./.nyc_output/coverage.json', JSON.stringify(coverage))
+        await writeFileAsync('./.nyc_output/coverage.json', JSON.stringify(coverageReport))
       }
 
       // perform clean up

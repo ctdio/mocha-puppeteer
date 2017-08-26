@@ -12,7 +12,7 @@
     "test": "nyc ava test/unit test/integration",
     "test:unit": "nyc ava test/unit",
     "test:integration": "nyc ava test/integration",
-    "coverage": "nyc report --reporter=lcov | coveralls"
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "author": "Charlie Duong",
   "license": "MIT",

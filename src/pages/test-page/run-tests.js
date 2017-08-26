@@ -44,8 +44,8 @@ socket.addEventListener('open', () => {
     await superagent.post('/end-test')
       .send({
         testsPassed,
-        // pass coverage back to server
-        coverage: window.__coverage__
+        // pass coverage report back to server
+        coverageReport: window.__coverage__
       })
   })
 })
