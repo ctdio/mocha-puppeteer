@@ -17,7 +17,6 @@
   "license": "MIT",
   "dependencies": {
     "babel-plugin-istanbul": "^4.1.4",
-    "glob": "^7.1.2",
     "koa": "^2.3.0",
     "koa-bodyparser": "^4.2.0",
     "koa-mount": "^3.0.0",

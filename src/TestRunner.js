@@ -6,6 +6,7 @@ require('lasso/browser-refresh').enable('*.marko *.css *.less')
 
 const puppeteer = require('puppeteer')
 
+const assert = require('assert')
 const http = require('http')
 const EventEmitter = require('events')
 const path = require('path')
@@ -24,8 +25,6 @@ const bodyParser = require('koa-bodyparser')
 const serve = require('koa-static')
 const mount = require('koa-mount')
 const Router = require('koa-path-router')
-
-const glob = require('glob')
 
 const testPageTemplate = marko.load(require('./pages/test-page'))
 
@@ -54,14 +53,6 @@ const DEFAULT_LASSO_CONFIG = {
   }
 }
 
-function _getTestDependencies (globPath) {
-  const files = glob.sync(globPath)
-
-  return files.map((file) => {
-    return `require-run: ${path.resolve(file)}`
-  })
-}
-
 class TestRunner extends EventEmitter {
   constructor (options = {}) {
     super()
@@ -70,8 +61,11 @@ class TestRunner extends EventEmitter {
     this._server = null
     this._browser = null
 
-    const { testsGlob } = options
-    const testDependencies = _getTestDependencies(testsGlob)
+    const { testFiles } = options
+
+    assert(Array.isArray(testFiles), 'testFiles must be provided as an array')
+
+    const tests = testFiles.map((file) => `require-run: ${path.resolve(file)}`)
 
     const app = this._app = new Koa()
     const router = new Router({
@@ -90,8 +84,8 @@ class TestRunner extends EventEmitter {
         'superagent/superagent.js',
         `require-run: ${require.resolve('./pages/test-page/setup')}`,
 
-        // inject test files
-        ...testDependencies,
+        // inject tests
+        ...tests,
 
         `require-run: ${require.resolve('./pages/test-page/run-tests')}`
       ]

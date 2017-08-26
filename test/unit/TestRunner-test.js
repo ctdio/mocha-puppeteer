@@ -54,7 +54,7 @@ test.beforeEach('setup mocks and test runner', (t) => {
   })
 
   const testRunner = new TestRunner({
-    testsGlob: 'someGlob'
+    testFiles: [] // use empty array
   })
 
   t.context = {
@@ -178,7 +178,7 @@ test('should call fs.mkdir and fs.writeFile upon completing a test if ' +
     fs: mockFs
   })
 
-  const testRunner = new TestRunner({ testsGlob: 'someglob/**/*.js' })
+  const testRunner = new TestRunner({ testFiles: [] })
   await testRunner.start()
 
   const testCompletePromise = waitForEvent(testRunner, 'complete')
@@ -215,7 +215,7 @@ test('should not call fs.mkdir and fs.writeFile upon completing a test if ' +
     fs: mockFs
   })
 
-  const testRunner = new TestRunner({ testsGlob: 'someglob/**/*.js' })
+  const testRunner = new TestRunner({ testFiles: [] })
   await testRunner.start()
 
   const testCompletePromise = waitForEvent(testRunner, 'complete')

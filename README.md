@@ -16,10 +16,11 @@ npm i -D mocha-puppeteer
 
 ## Usage
 
-To run your tests, you can pass a glob to the exposed cli tool.
+To run your tests, you can pass in the test files to the exposed cli tool. A glob works too depending
+on the shell you are using.
 
 ```
-npx mocha-puppeteer ./tests/**/*.js
+npx mocha-puppeteer ./tests/*.js
 ```
 
 ## Contributing
