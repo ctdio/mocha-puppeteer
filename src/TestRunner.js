@@ -69,6 +69,7 @@ class TestRunner extends EventEmitter {
     this._app = null
     this._server = null
     this._browser = null
+    this._puppeteerOptions = { options }
 
     const { testsGlob } = options
     const testDependencies = _getTestDependencies(testsGlob)
@@ -169,7 +170,8 @@ class TestRunner extends EventEmitter {
         })
 
         try {
-          const browser = this._browser = await puppeteer.launch()
+          const puppeteerOptions = this._puppeteerOptions
+          const browser = this._browser = await puppeteer.launch(puppeteerOptions)
           const page = await browser.newPage()
 
           const { columns } = process.stdout
