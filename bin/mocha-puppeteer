@@ -7,7 +7,7 @@ const args = process.argv.slice(2)
 ;(async () => {
   try {
     await mochaPuppeteer.runTests({
-      testsGlob: args[0]
+      testFiles: args
     })
   } catch (err) {
     process.exit(1)

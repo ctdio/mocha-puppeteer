@@ -6,6 +6,7 @@ require('lasso/browser-refresh').enable('*.marko *.css *.less')
 
 const puppeteer = require('puppeteer')
 
+const assert = require('assert')
 const http = require('http')
 const EventEmitter = require('events')
 const path = require('path')
@@ -25,16 +26,14 @@ const serve = require('koa-static')
 const mount = require('koa-mount')
 const Router = require('koa-path-router')
 
-const glob = require('glob')
-
 const testPageTemplate = marko.load(require('./pages/test-page'))
 
 const { Server: WebSocketServer } = require('ws')
 
-const STATIC_DIR = `${process.cwd()}/.mocha-puppeteer`
+const uuid = require('uuid')
+const rimrafAsync = promisify(require('rimraf'))
 
 const DEFAULT_LASSO_CONFIG = {
-  outputDir: STATIC_DIR,
   minify: false,
   bundlingEnabled: false,
   fingerprintsEnabled: false,
@@ -54,14 +53,6 @@ const DEFAULT_LASSO_CONFIG = {
   }
 }
 
-function _getTestDependencies (globPath) {
-  const files = glob.sync(globPath)
-
-  return files.map((file) => {
-    return `require-run: ${path.resolve(file)}`
-  })
-}
-
 class TestRunner extends EventEmitter {
   constructor (options = {}) {
     super()
@@ -71,8 +62,14 @@ class TestRunner extends EventEmitter {
     this._browser = null
     this._puppeteerOptions = { options }
 
-    const { testsGlob } = options
-    const testDependencies = _getTestDependencies(testsGlob)
+    const { testFiles } = options
+    assert(Array.isArray(testFiles), 'testFiles must be provided as an array')
+
+    const outputDir = `./.mocha-puppeteer-${uuid.v4()}`
+
+    const baseLassoConfig = Object.assign({ outputDir }, DEFAULT_LASSO_CONFIG)
+
+    const tests = testFiles.map((file) => `require-run: ${path.resolve(file)}`)
 
     const app = this._app = new Koa()
     const router = new Router({
@@ -83,7 +80,7 @@ class TestRunner extends EventEmitter {
       ctx.type = 'html'
 
       // TODO: allow overrides to be applied onto config
-      const pageLasso = lasso.create(DEFAULT_LASSO_CONFIG)
+      const pageLasso = lasso.create(baseLassoConfig)
 
       const dependencies = [
         'mocha/mocha.css',
@@ -91,8 +88,8 @@ class TestRunner extends EventEmitter {
         'superagent/superagent.js',
         `require-run: ${require.resolve('./pages/test-page/setup')}`,
 
-        // inject test files
-        ...testDependencies,
+        // inject tests
+        ...tests,
 
         `require-run: ${require.resolve('./pages/test-page/run-tests')}`
       ]
@@ -131,6 +128,9 @@ class TestRunner extends EventEmitter {
         await writeFileAsync('./.nyc_output/coverage.json', JSON.stringify(coverage))
       }
 
+      // perform clean up
+      await rimrafAsync(outputDir)
+
       if (errorMsg) {
         this.emit('error', new Error(errorMsg))
       } else {
@@ -142,7 +142,7 @@ class TestRunner extends EventEmitter {
     })
 
     app.use(router.getRequestHandler())
-    app.use(mount('/static', serve(STATIC_DIR)))
+    app.use(mount('/static', serve(outputDir)))
   }
 
   async start () {
