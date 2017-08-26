@@ -60,7 +60,7 @@ class TestRunner extends EventEmitter {
     this._app = null
     this._server = null
     this._browser = null
-    this._puppeteerOptions = { options }
+    this._puppeteerOptions = options.puppeteerOptions
 
     const { testFiles } = options
     assert(Array.isArray(testFiles), 'testFiles must be provided as an array')
