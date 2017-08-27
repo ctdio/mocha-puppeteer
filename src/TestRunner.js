@@ -9,7 +9,6 @@ const puppeteer = require('puppeteer')
 const assert = require('assert')
 const http = require('http')
 const EventEmitter = require('events')
-const path = require('path')
 
 const fs = require('fs')
 const { promisify } = require('util')
@@ -59,7 +58,8 @@ class TestRunner extends EventEmitter {
     super()
 
     this._app = null
-    this._server = null
+    this._httpServer = null
+    this._webSocketServer = null
     this._browser = null
 
     const {
@@ -79,7 +79,7 @@ class TestRunner extends EventEmitter {
       DEFAULT_LASSO_CONFIG,
       instrumentCode && ISTANBUL_LASSO_CONFIG_ADDON)
 
-    const tests = testFiles.map((file) => `require-run: ${path.resolve(file)}`)
+    const tests = testFiles.map((file) => `require-run: ${require.resolve(file)}`)
 
     const app = this._app = new Koa()
     const router = new Router({
@@ -125,17 +125,21 @@ class TestRunner extends EventEmitter {
       } = ctx.request.body
 
       if (coverageReport) {
+        let ableToWriteFile = true
         // write to nyc temp dir so that coverage can be collected
         try {
           await mkdirAsync('./.nyc_output')
         } catch (err) {
           if (err.code !== 'EEXIST') {
             console.error('Unable to create temporary directory', err)
-            throw err
+            ableToWriteFile = false
           }
         }
 
-        await writeFileAsync('./.nyc_output/coverage.json', JSON.stringify(coverageReport))
+        if (ableToWriteFile) {
+          await writeFileAsync('./.nyc_output/coverage.json',
+            JSON.stringify(coverageReport))
+        }
       }
 
       // perform clean up
@@ -157,45 +161,46 @@ class TestRunner extends EventEmitter {
 
   async start () {
     return new Promise((resolve, reject) => {
-      const httpServer = this._server = http.createServer(this._app.callback()).listen(async () => {
-        const { port } = this._server.address()
+      const httpServer = this._server = http.createServer(this._app.callback())
+        .listen(async () => {
+          const { port } = this._server.address()
 
-        console.info(`Test server is listening on http://localhost:${port}...`)
+          console.info(`Test server is listening on http://localhost:${port}...`)
 
-        // webSockets are used to send stdout and console logs to server in order
-        const webSocketServer = new WebSocketServer({
-          server: httpServer,
-          path: '/ws'
-        })
-
-        webSocketServer.on('connection', (client) => {
-          client.on('message', (rawMessage) => {
-            const { type, data } = JSON.parse(rawMessage)
-            if (type === 'stdout') {
-              process.stdout.write(data)
-            } else {
-              console.log(...data)
-            }
+          // webSockets are used to send stdout and console logs to server in order
+          const webSocketServer = this._webSocketServer = new WebSocketServer({
+            server: httpServer,
+            path: '/ws'
           })
+
+          webSocketServer.on('connection', (client) => {
+            client.on('message', (rawMessage) => {
+              const { type, data } = JSON.parse(rawMessage)
+              if (type === 'stdout') {
+                process.stdout.write(data)
+              } else {
+                console.log(...data)
+              }
+            })
+          })
+
+          try {
+            const browser = this._browser = await puppeteer.launch()
+            const page = await browser.newPage()
+
+            const { columns } = process.stdout
+
+            // set viewport width and height to number of columns
+            // for cleaner output
+            page.setViewport({ width: columns, height: columns })
+
+            await page.goto(`http://localhost:${port}`)
+          } catch (err) {
+            reject(err)
+          }
+
+          resolve()
         })
-
-        try {
-          const browser = this._browser = await puppeteer.launch()
-          const page = await browser.newPage()
-
-          const { columns } = process.stdout
-
-          // set viewport width and height to number of columns
-          // for cleaner output
-          page.setViewport({ width: columns, height: columns })
-
-          await page.goto(`http://localhost:${port}`)
-        } catch (err) {
-          reject(err)
-        }
-
-        resolve()
-      })
     })
   }
 }

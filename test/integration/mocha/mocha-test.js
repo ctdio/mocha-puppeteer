@@ -27,3 +27,27 @@ test('#runTests should reject for failing tests', async (t) => {
     t.pass(err)
   }
 })
+
+test('#runTests should reject if unable to resolve test files', async (t) => {
+  try {
+    await runTests({
+      testFiles: [ 'non existant test file' ]
+    })
+    t.fail()
+  } catch (err) {
+    console.log(err)
+    t.pass(err)
+  }
+})
+
+test('#runTests should reject if error occurs during test', async (t) => {
+  try {
+    await runTests({
+      testFiles: [] // no test files will cause mocha runner to timeout
+    })
+    t.fail()
+  } catch (err) {
+    console.log(err)
+    t.pass(err)
+  }
+})

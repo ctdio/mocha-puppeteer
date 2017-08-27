@@ -9,7 +9,10 @@ proxyquire.noPreserveCache()
 const waitForEvent = require('~/test/util/waitForEvent')
 
 const superagent = require('superagent')
+const WebSocket = require('ws')
 const EventEmitter = require('events')
+
+const uuid = require('uuid')
 
 class MockPage extends EventEmitter {
   async goto (url) {
@@ -96,6 +99,26 @@ test('should direct puppeteer page to "goto" the root path of the ' +
   const { port } = server.address()
 
   sandbox.assert.calledWith(gotoSpy, `http://localhost:${port}`)
+})
+
+test('should fail to start if unable to start puppeteer', async (t) => {
+  const {
+    testRunner,
+    mockPuppeteer,
+    sandbox
+  } = t.context
+
+  const failedToStartError = new Error('failed to start puppeteer')
+
+  sandbox.stub(mockPuppeteer, 'launch').throws(failedToStartError)
+
+  try {
+    await testRunner.start()
+    t.fail()
+  } catch (err) {
+    t.is(err, failedToStartError)
+    t.pass()
+  }
 })
 
 test('should tear down server and browser upon ending test', async (t) => {
@@ -239,6 +262,47 @@ test('should not call fs.mkdir and fs.writeFile upon completing a test if ' +
   sandbox.assert.notCalled(writeFileSpy)
 })
 
+test('should not error out if mkdirAsync throws an error code ' +
+'that is not "EEXIST"', async (t) => {
+  t.plan(0)
+
+  const {
+    sandbox,
+    mockPuppeteer,
+    mockFs
+  } = t.context
+
+  const testError = new Error('Code is not "EEXIST"')
+  testError.code = 'NOT_EEXIST'
+  sandbox.stub(mockFs, 'mkdir').throws(testError)
+  const writeFileSpy = sandbox.spy(mockFs, 'writeFile')
+
+  const TestRunner = proxyquire('~/src/TestRunner', {
+    puppeteer: mockPuppeteer,
+    fs: mockFs
+  })
+
+  const testRunner = new TestRunner({
+    testFiles: [],
+    _instrumentCode: false
+  })
+
+  await testRunner.start()
+
+  const testCompletePromise = waitForEvent(testRunner, 'complete')
+
+  await _sendTestEndRequest(testRunner, {
+    testsPassed: true,
+    coverageReport: {}
+  })
+
+  await testCompletePromise
+
+  testRunner._server.close()
+
+  sandbox.assert.notCalled(writeFileSpy)
+})
+
 test('should set the viewport\'s height and width to the stdout column width', async (t) => {
   t.plan(0)
 
@@ -261,4 +325,43 @@ test('should set the viewport\'s height and width to the stdout column width', a
     width: columns,
     height: columns
   })
+})
+
+test('should call process.stdout.write if websocket server receives ' +
+'a message of type "stdout"', async (t) => {
+  t.plan(0)
+
+  const {
+    testRunner,
+    sandbox
+  } = t.context
+
+  const testData = uuid.v4()
+  const testMessage = JSON.stringify({
+    type: 'stdout',
+    data: testData
+  })
+
+  const writeSpy = sandbox.spy(process.stdout, 'write')
+
+  const startedPromise = waitForEvent(testRunner, 'started')
+  await testRunner.start()
+  const runnerClientPromise = waitForEvent(testRunner._webSocketServer, 'connection')
+  console.log('got a client')
+  await startedPromise
+
+  const { port } = testRunner._server.address()
+
+  const webSocket = new WebSocket(`ws://localhost:${port}/ws`)
+  await waitForEvent(webSocket, 'open')
+  const runnerWebSocketClient = await runnerClientPromise
+
+  const messagePromise = waitForEvent(runnerWebSocketClient, 'message', (message) => {
+    return message === testMessage
+  })
+
+  webSocket.send(testMessage)
+
+  await messagePromise
+  sandbox.assert.calledWith(writeSpy, testData)
 })
