@@ -9,6 +9,7 @@ const puppeteer = require('puppeteer')
 const assert = require('assert')
 const http = require('http')
 const EventEmitter = require('events')
+const path = require('path')
 
 const fs = require('fs')
 const { promisify } = require('util')
@@ -79,7 +80,8 @@ class TestRunner extends EventEmitter {
       DEFAULT_LASSO_CONFIG,
       instrumentCode && ISTANBUL_LASSO_CONFIG_ADDON)
 
-    const tests = testFiles.map((file) => `require-run: ${require.resolve(file)}`)
+    const tests = testFiles
+      .map((file) => `require-run: ${require.resolve(path.resolve(file))}`)
 
     const app = this._app = new Koa()
     const router = new Router({
@@ -106,9 +108,15 @@ class TestRunner extends EventEmitter {
 
       this.emit('started')
 
+      console.log('starting')
+
       ctx.body = testPageTemplate.stream({
         lasso: pageLasso,
         dependencies
+      })
+
+      ctx.body.on('error', (err) => {
+        console.error(err)
       })
     })
 
