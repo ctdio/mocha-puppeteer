@@ -65,12 +65,13 @@ class TestRunner extends EventEmitter {
 
     const {
       testFiles,
-      _instrumentCode
+      _instrumentCode,
+      _randomizeOutputDir
     } = options
 
     assert(Array.isArray(testFiles), 'testFiles must be provided as an array')
 
-    const outputDir = `./.mocha-puppeteer-${uuid.v4()}`
+    const outputDir = `./.mocha-puppeteer${_randomizeOutputDir ? uuid.v4() : ''}`
 
     const instrumentCode = _instrumentCode === undefined
       ? !!process.env.NYC_CONFIG
@@ -107,8 +108,6 @@ class TestRunner extends EventEmitter {
       ]
 
       this.emit('started')
-
-      console.log('starting')
 
       ctx.body = testPageTemplate.stream({
         lasso: pageLasso,
@@ -151,7 +150,9 @@ class TestRunner extends EventEmitter {
       }
 
       // perform clean up
-      await rimrafAsync(outputDir)
+      if (_randomizeOutputDir) {
+        await rimrafAsync(outputDir)
+      }
 
       if (errorMsg) {
         this.emit('error', new Error(errorMsg))
