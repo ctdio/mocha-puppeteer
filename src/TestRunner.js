@@ -23,8 +23,10 @@ const Server = require('./Server')
 const _prepareTestPageInput = require('./utils/prepareTestPageInput')
 
 class TestRunner extends EventEmitter {
-  constructor (options = {}) {
+  constructor (options) {
     super()
+
+    assert(options, 'Test runner options must be provided (at least testFiles)')
 
     this._app = null
     this._httpServer = null
