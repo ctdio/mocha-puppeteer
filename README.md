@@ -1,5 +1,9 @@
 # mocha-puppeteer
 
+[![Build Status](https://travis-ci.org/charlieduong94/mocha-puppeteer.svg?branch=master)](https://travis-ci.org/charlieduong94/mocha-puppeteer)
+[![Coverage Status](https://coveralls.io/repos/github/charlieduong94/mocha-puppeteer/badge.svg?branch=master)](https://coveralls.io/github/charlieduong94/mocha-puppeteer?branch=master)
+
+
 Since the release of Google Chrome headless mode, the Chrome DevTools team has developed
 [puppeteer](https://github.com/GoogleChrome/puppeteer) for running and managing an instance of Chromium.
 This module makes it possible to run tests written with

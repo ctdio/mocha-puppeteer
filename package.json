@@ -1,6 +1,6 @@
 {
   "name": "mocha-puppeteer",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Run tests in headless chrome",
   "main": "index.js",
   "bin": {
@@ -11,7 +11,8 @@
     "pretest": "npm run lint",
     "test": "nyc ava test/unit test/integration",
     "test:unit": "nyc ava test/unit",
-    "test:integration": "nyc ava test/integration"
+    "test:integration": "nyc ava test/integration",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "author": "Charlie Duong",
   "license": "MIT",
@@ -32,6 +33,7 @@
   },
   "devDependencies": {
     "ava": "^0.22.0",
+    "coveralls": "^2.13.1",
     "eslint": "^4.5.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-config-standard-plus": "0.0.1",
