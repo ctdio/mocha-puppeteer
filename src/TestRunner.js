@@ -62,6 +62,7 @@ class TestRunner extends EventEmitter {
     this._httpServer = null
     this._webSocketServer = null
     this._browser = null
+    this._puppeteerOptions = options.puppeteerOptions
 
     const {
       testFiles,
@@ -194,7 +195,8 @@ class TestRunner extends EventEmitter {
           })
 
           try {
-            const browser = this._browser = await puppeteer.launch()
+            const puppeteerOptions = this._puppeteerOptions
+            const browser = this._browser = await puppeteer.launch(puppeteerOptions)
             const page = await browser.newPage()
 
             const { columns } = process.stdout
