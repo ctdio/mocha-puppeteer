@@ -65,6 +65,7 @@ test.beforeEach('setup mocks and test runner', (t) => {
   })
 
   t.context = {
+    TestRunner,
     testRunner,
     mockPuppeteer,
     mockBrowser,
@@ -267,8 +268,8 @@ test('should not call fs.mkdir and fs.writeFile upon completing a test if ' +
   sandbox.assert.notCalled(writeFileSpy)
 })
 
-test('should not error out if mkdirAsync throws an error code ' +
-'that is not "EEXIST"', async (t) => {
+test('should still write coverage file if mkdir throws an error code ' +
+'that is "EEXIST"', async (t) => {
   t.plan(0)
 
   const {
@@ -277,8 +278,49 @@ test('should not error out if mkdirAsync throws an error code ' +
     mockFs
   } = t.context
 
-  const testError = new Error('Code is not "EEXIST"')
-  testError.code = 'NOT_EEXIST'
+  const testError = new Error('Code is "EEXIST"')
+  testError.code = 'EEXIST'
+  sandbox.stub(mockFs, 'mkdir').throws(testError)
+  const writeFileSpy = sandbox.spy(mockFs, 'writeFile')
+
+  const TestRunner = proxyquire('~/src/TestRunner', {
+    puppeteer: mockPuppeteer,
+    fs: mockFs
+  })
+
+  const testRunner = new TestRunner({
+    testFiles: [],
+    _instrumentCode: false
+  })
+
+  await testRunner.start()
+
+  const testCompletePromise = waitForEvent(testRunner, 'complete')
+
+  await _sendTestEndRequest(testRunner, {
+    testsPassed: true,
+    coverageReport: {}
+  })
+
+  await testCompletePromise
+
+  testRunner._server.close()
+
+  sandbox.assert.calledOnce(writeFileSpy)
+})
+
+test('should still write coverage file if mkdir throws an error code ' +
+'that is "EEXIST"', async (t) => {
+  t.plan(0)
+
+  const {
+    sandbox,
+    mockPuppeteer,
+    mockFs
+  } = t.context
+
+  const testError = new Error('Code is "EEXIST"')
+  testError.code = 'NOT EEXIST'
   sandbox.stub(mockFs, 'mkdir').throws(testError)
   const writeFileSpy = sandbox.spy(mockFs, 'writeFile')
 
@@ -368,4 +410,19 @@ test('should call process.stdout.write if websocket server receives ' +
 
   await messagePromise
   sandbox.assert.calledWith(writeSpy, testData)
+})
+
+test('should throw an error if no test options are provided', async (t) => {
+  t.plan(1)
+
+  const {
+    TestRunner
+  } = t.context
+
+  try {
+    const testRunner = new TestRunner()
+    await testRunner.start()
+  } catch (err) {
+    t.true(err.message.includes('options must be provided'))
+  }
 })
