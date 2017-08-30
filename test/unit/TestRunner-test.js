@@ -24,7 +24,7 @@ class MockPage extends EventEmitter {
 
 async function _sendTestEndRequest (testRunner, payload) {
   const server = testRunner._server
-  const { port } = server.address()
+  const port = server.getPort()
 
   return superagent.post(`http://localhost:${port}/end-test`)
     .send(payload)
@@ -51,6 +51,10 @@ test.beforeEach('setup mocks and test runner', (t) => {
     launch: () => mockBrowser
   }
 
+  const mockLasso = {
+    create () {}
+  }
+
   const TestRunner = proxyquire('~/src/TestRunner', {
     puppeteer: mockPuppeteer,
     fs: mockFs
@@ -64,6 +68,7 @@ test.beforeEach('setup mocks and test runner', (t) => {
     testRunner,
     mockPuppeteer,
     mockBrowser,
+    mockLasso,
     mockPage,
     mockFs,
     sandbox
@@ -96,7 +101,7 @@ test('should direct puppeteer page to "goto" the root path of the ' +
   await testRunner.start()
 
   const server = testRunner._server
-  const { port } = server.address()
+  const port = server.getPort()
 
   sandbox.assert.calledWith(gotoSpy, `http://localhost:${port}`)
 })
@@ -314,7 +319,7 @@ test('should set the viewport\'s height and width to the stdout column width', a
 
   const setViewportSpy = sandbox.spy(mockPage, 'setViewport')
 
-  const startedPromise = waitForEvent(testRunner, 'started')
+  const startedPromise = waitForEvent(testRunner, 'start')
   await testRunner.start()
 
   await startedPromise
@@ -344,13 +349,12 @@ test('should call process.stdout.write if websocket server receives ' +
 
   const writeSpy = sandbox.spy(process.stdout, 'write')
 
-  const startedPromise = waitForEvent(testRunner, 'started')
+  const startedPromise = waitForEvent(testRunner, 'start')
   await testRunner.start()
-  const runnerClientPromise = waitForEvent(testRunner._webSocketServer, 'connection')
-  console.log('got a client')
+  const runnerClientPromise = waitForEvent(testRunner._server, 'web-socket-connection')
   await startedPromise
 
-  const { port } = testRunner._server.address()
+  const port = testRunner._server.getPort()
 
   const webSocket = new WebSocket(`ws://localhost:${port}/ws`)
   await waitForEvent(webSocket, 'open')
