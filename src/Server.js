@@ -69,7 +69,6 @@ class Server extends EventEmitter {
       const httpServer = this._server = http.createServer(this._app.callback())
         .listen(async () => {
           const { port } = httpServer.address()
-          console.log(port)
           this._port = port
 
           console.info(`Test server is listening on http://localhost:${port}...`)
