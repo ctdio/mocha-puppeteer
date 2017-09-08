@@ -1,5 +1,3 @@
-require('require-self-ref')
-
 const test = require('ava')
 
 const sinon = require('sinon')
