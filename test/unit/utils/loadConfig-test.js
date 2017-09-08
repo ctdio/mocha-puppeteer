@@ -1,6 +1,5 @@
 const test = require('ava')
 
-const sinon = require('sinon')
 const proxyquire = require('proxyquire')
 proxyquire.noPreserveCache()
 
@@ -9,16 +8,6 @@ const path = require('path')
 
 const TEST_CWD = '/home/projects/open-source/mocha-puppeteer/test/fixtures'
 const CONFIG_NAME = '.mocha-puppeteer-config.js'
-
-let processCwdStub
-
-test.before(() => {
-  processCwdStub = sinon.stub(global.process, 'cwd').returns(TEST_CWD)
-})
-
-test.after(() => {
-  processCwdStub.restore()
-})
 
 test.beforeEach('setup testConfig', (t) => {
   const testConfig = {
@@ -43,7 +32,11 @@ async function _testLoadConfig ({ t, mockConfigPath, testConfig, expected }) {
 
     [ mockConfigPath ]: Object.assign(testConfig)
   })
-  const config = await loadConfig({ verbose: true })
+
+  const config = await loadConfig({
+    startingDirectory: TEST_CWD,
+    verbose: true
+  })
 
   t.is(config, expected)
 }
@@ -100,7 +93,9 @@ test('should throw an error if failed to load config', async (t) => {
   })
 
   try {
-    await loadConfig()
+    await loadConfig({
+      startingDirectory: TEST_CWD
+    })
   } catch (err) {
     t.true(err.message.includes('Unable to load config'))
   }

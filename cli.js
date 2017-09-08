@@ -13,7 +13,9 @@ function _pickConfig (config) {
 
 module.exports = async function runCli () {
   try {
-    const config = await _loadConfig()
+    const config = await _loadConfig({
+      startingDirectory: process.cwd()
+    })
 
     const options = config ? _pickConfig(config) : {}
 

@@ -10,8 +10,8 @@ const { R_OK: READABLE } = fs.constants
 const { promisify } = require('bluebird')
 const accessAsync = promisify(fs.access)
 
-module.exports = async function _loadConfig ({ verbose } = {}) {
-  let currentDirectory = process.cwd()
+module.exports = async function _loadConfig ({ startingDirectory, verbose }) {
+  let currentDirectory = startingDirectory
 
   let parentDirectory
   let config
