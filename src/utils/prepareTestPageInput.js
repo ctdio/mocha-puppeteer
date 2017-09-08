@@ -7,33 +7,50 @@ const DEFAULT_LASSO_CONFIG = {
   fingerprintsEnabled: false
 }
 
-const ISTANBUL_LASSO_CONFIG_ADDON = {
-  require: {
-    transforms: [
-      {
-        transform: 'lasso-babel-transform',
-        config: {
-          babelOptions: {
-            plugins: [ require.resolve('babel-plugin-istanbul') ]
-          }
-        }
-      }
-    ]
+const ISTANBUL_LASSO_TRANSFORM_ADDON = {
+  transform: 'lasso-babel-transform',
+  config: {
+    babelOptions: {
+      plugins: [ require.resolve('babel-plugin-istanbul') ]
+    }
   }
+}
+
+function _buildConfig ({ outputDir, inputConfig, instrumentCode }) {
+  const config = Object.assign({ outputDir },
+    DEFAULT_LASSO_CONFIG,
+    inputConfig)
+
+  if (instrumentCode) {
+    if (config.require) {
+      if (config.require.transforms) {
+        config.require.transforms.push(ISTANBUL_LASSO_TRANSFORM_ADDON)
+      } else {
+        config.require.transforms = [ ISTANBUL_LASSO_TRANSFORM_ADDON ]
+      }
+    } else {
+      config.require = {
+        transforms: [ ISTANBUL_LASSO_TRANSFORM_ADDON ]
+      }
+    }
+  }
+
+  return config
 }
 
 module.exports = function _prepareTestPageInput (options) {
   const {
     outputDir,
     instrumentCode,
-    lassoConfig,
+    lassoConfig: inputConfig,
     testFiles
   } = options
 
-  const fullConfig = Object.assign({ outputDir },
-    DEFAULT_LASSO_CONFIG,
-    instrumentCode && ISTANBUL_LASSO_CONFIG_ADDON,
-    lassoConfig)
+  const fullConfig = _buildConfig({
+    outputDir,
+    inputConfig,
+    instrumentCode
+  })
 
   const pageLasso = lasso.create(fullConfig)
 
