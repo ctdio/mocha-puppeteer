@@ -6,15 +6,13 @@
 
 Since the release of Google Chrome headless mode, the Chrome DevTools team has developed
 [puppeteer](https://github.com/GoogleChrome/puppeteer) for running and managing an instance of Chromium.
-This module makes it possible to run tests written with
-[mocha](https://github.com/mochajs/mocha) inside of a Chromium instance.
-
-
-*Note:* Still under dev. Nothing is really configurable right now. Come back later.
+This module makes it possible to easily run tests written with [mocha](https://github.com/mochajs/mocha)
+inside of a Chromium instance. Module bundling is automatically handled using
+[lasso](https://github.com/lasso-js/lasso).
 
 ## Installation
 
-```
+```bash
 npm i -D mocha-puppeteer
 ```
 
@@ -23,9 +21,42 @@ npm i -D mocha-puppeteer
 To run your tests, you can pass in the test files to the exposed cli tool. A glob works too depending
 on the shell you are using.
 
+```bash
+npx mocha-puppeteer ./tests/dirA/*.js ./test/dirB/*.js
 ```
-npx mocha-puppeteer ./tests/*.js
+
+You can also get test coverage information using `nyc`
+
+```bash
+npx nyc mocha-puppeteer ./test/*.js
 ```
+
+## Configuring the test file
+You can configure `mocha-puppeteer` with a `.mocha-puppeteer-config.js` file.
+
+Example config file:
+
+```js
+require('require-self-ref')
+
+module.exports = {
+  lassoConfig: {
+    require: {
+      transforms: [
+        {
+          transform: require('lasso-babel-transform'),
+          config: {
+            extensions: ['.js', '.es6']
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+At the moment, only options for configuring `lasso` are supported with the `lassoConfig` field.
+Babel transforms can be applied using the [lasso-babel-transform](https://github.com/lasso-js/lasso-babel-transform) module.
 
 ## Contributing
 
