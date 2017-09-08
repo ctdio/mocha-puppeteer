@@ -111,6 +111,9 @@ class TestRunner extends EventEmitter {
     const browser = this._browser = await puppeteer.launch()
     const page = await browser.newPage()
 
+    page.on('error', (err) => this.emit('error', err))
+    page.on('pageerror', (err) => this.emit('error', err))
+
     const { columns } = process.stdout
 
     // set viewport width and height to number of columns
