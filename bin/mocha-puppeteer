@@ -1,15 +1,3 @@
 #!/usr/bin/env node
 
-const mochaPuppeteer = require('../index')
-
-const args = process.argv.slice(2)
-
-;(async () => {
-  try {
-    await mochaPuppeteer.runTests({
-      testFiles: args
-    })
-  } catch (err) {
-    process.exit(1)
-  }
-})()
+require('../cli')()
