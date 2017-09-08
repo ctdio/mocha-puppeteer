@@ -13,7 +13,7 @@ function _pickConfig (config) {
 
 module.exports = async function runCli () {
   try {
-    const config = await _loadConfig({ verbose: true })
+    const config = await _loadConfig()
 
     const options = config ? _pickConfig(config) : {}
 
