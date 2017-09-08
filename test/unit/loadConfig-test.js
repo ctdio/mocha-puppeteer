@@ -8,7 +8,7 @@ const uuid = require('uuid')
 const path = require('path')
 
 const TEST_CWD = '/home/projects/open-source/mocha-puppeteer/test/fixtures'
-const CONFIG_NAME = '.mocha-puppeteer-config'
+const CONFIG_NAME = '.mocha-puppeteer-config.js'
 
 let processCwdStub
 
@@ -43,7 +43,7 @@ async function _testLoadConfig ({ t, mockConfigPath, testConfig, expected }) {
 
     [ mockConfigPath ]: Object.assign(testConfig)
   })
-  const config = await loadConfig()
+  const config = await loadConfig({ verbose: true })
 
   t.is(config, expected)
 }
@@ -76,8 +76,32 @@ test('should be able to load a config multiple directories up', async (t) => {
 
 test('should return undefined if unable to find a config', async (t) => {
   const { testConfig } = t.context
-
   const mockConfigPath = `${TEST_CWD}/someDir/${CONFIG_NAME}`
 
   return _testLoadConfig({ t, mockConfigPath, testConfig, expected: undefined })
+})
+
+test('should throw an error if failed to load config', async (t) => {
+  t.plan(1)
+
+  const mockConfigPath = `${TEST_CWD}/${CONFIG_NAME}`
+
+  // don't expose the config as a module
+  const loadConfig = proxyquire('~/src/utils/loadConfig', {
+    fs: {
+      access (path, mode, callback) {
+        if (path === mockConfigPath) {
+          callback()
+        } else {
+          callback(new Error('No access'))
+        }
+      }
+    }
+  })
+
+  try {
+    await loadConfig()
+  } catch (err) {
+    t.true(err.message.includes('Unable to load config'))
+  }
 })

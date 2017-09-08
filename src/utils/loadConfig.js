@@ -2,7 +2,7 @@
  * loads the .mocha-puppeteer-config file
  */
 const path = require('path')
-const CONFIG_FILE_NAME = '.mocha-puppeteer-config'
+const CONFIG_FILE_NAME = '.mocha-puppeteer-config.js'
 
 const fs = require('fs')
 const { R_OK: READABLE } = fs.constants
@@ -26,10 +26,12 @@ module.exports = async function _loadConfig ({ verbose } = {}) {
 
     try {
       const path = `${currentDirectory}/${CONFIG_FILE_NAME}`
-      await accessAsync(path, READABLE)
+      verbose && console.log(`Searching at ${currentDirectory} for a config...`)
+
+      await accessAsync(`${path}`, READABLE)
       configPath = path
     } catch (err) {
-      verbose && console.log(`No config found in ${currentDirectory}`)
+      verbose && console.error(`No config found in ${currentDirectory}`)
       currentDirectory = path.dirname(currentDirectory)
     }
   }
@@ -38,8 +40,7 @@ module.exports = async function _loadConfig ({ verbose } = {}) {
     try {
       config = require(configPath)
     } catch (err) {
-      console.error(err)
-      throw new Error(`Unable to load config at ${configPath}`, err)
+      throw new Error(`Unable to load config at ${configPath}`)
     }
   }
 
