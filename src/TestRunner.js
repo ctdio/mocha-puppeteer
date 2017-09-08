@@ -10,7 +10,7 @@ const assert = require('assert')
 const EventEmitter = require('events')
 
 const fs = require('fs')
-const { promisify } = require('util')
+const { promisify } = require('bluebird')
 
 const writeFileAsync = promisify(fs.writeFile)
 const mkdirAsync = promisify(fs.mkdir)

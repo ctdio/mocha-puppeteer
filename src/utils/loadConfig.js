@@ -7,7 +7,7 @@ const CONFIG_FILE_NAME = '.mocha-puppeteer-config.js'
 const fs = require('fs')
 const { R_OK: READABLE } = fs.constants
 
-const { promisify } = require('util')
+const { promisify } = require('bluebird')
 const accessAsync = promisify(fs.access)
 
 module.exports = async function _loadConfig ({ verbose } = {}) {
