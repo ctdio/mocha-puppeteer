@@ -1,5 +1,9 @@
 # mocha-puppeteer
 
+<p align="center">
+  <img src="./logos/mocha-puppeteer.png" alt="mocha-puppeteer logo" width="300" />
+</p>
+
 [![Build Status](https://travis-ci.org/charlieduong94/mocha-puppeteer.svg?branch=master)](https://travis-ci.org/charlieduong94/mocha-puppeteer)
 [![Coverage Status](https://coveralls.io/repos/github/charlieduong94/mocha-puppeteer/badge.svg?branch=master)](https://coveralls.io/github/charlieduong94/mocha-puppeteer?branch=master)
 
@@ -114,3 +118,8 @@ If you find a bug or have an idea about how to improve the module, please create
 for a bug, feel free to submit a pull request.
 
 You can run tests with the `npm test` command.
+
+## Credits
+
+- [Smashicons](https://www.flaticon.com/authors/smashicons)
+- [Flaticon](https://www.flaticon.com/)
