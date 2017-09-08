@@ -17,6 +17,7 @@
   "author": "Charlie Duong",
   "license": "MIT",
   "dependencies": {
+    "argly": "^1.2.0",
     "babel-plugin-istanbul": "^4.1.4",
     "bluebird": "^3.5.0",
     "koa": "^2.3.0",

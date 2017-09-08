@@ -1,3 +1,11 @@
 #!/usr/bin/env node
+const cli = require('../cli')
 
-require('../cli')()
+;(async () => {
+  try {
+    await cli()
+  } catch (err) {
+    console.error(err)
+    process.exit(1)
+  }
+})()

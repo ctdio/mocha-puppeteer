@@ -31,6 +31,56 @@ You can also get test coverage information using `nyc`
 npx nyc mocha-puppeteer ./test/*.js
 ```
 
+All available options:
+
+```
+Usage: mocha-puppeteer [OPTIONS]
+
+Examples:
+
+   Test a single file: "mocha-puppeteer /foo/bar-test.js"
+
+   Test a series of files using a glob pattern: "mocha-puppeteer /foo/*/*-test.js"
+
+Options:
+
+     --help -h Show this help message [string]
+
+  --version -v Show the version number of mocha-puppeteer [string]
+
+--pattern -p * Pattern to run tests. Either a single file or glob pattern. [string]
+```
+
+## Configuring the test file
+You can configure `mocha-puppeteer` with a `.mocha-puppeteer-config.js` file.
+
+Example config file:
+
+```js
+require('require-self-ref')
+
+module.exports = {
+  lassoConfig: {
+    require: {
+      transforms: [
+        {
+          transform: require('lasso-babel-transform'),
+          config: {
+            extensions: ['.js', '.es6']
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+You can also get test coverage information using `nyc`
+
+```bash
+npx nyc mocha-puppeteer ./test/*.js
+```
+
 ## Configuring tests
 You can configure `mocha-puppeteer` with a `.mocha-puppeteer-config.js` file.
 
