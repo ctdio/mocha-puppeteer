@@ -40,7 +40,7 @@ Examples:
 
    Test a single file: "mocha-puppeteer /foo/bar-test.js"
 
-   Test a series of files using a glob pattern: "mocha-puppeteer /foo/**/*-test.js"
+   Test a series of files using a glob pattern: "mocha-puppeteer /foo/*/*-test.js"
 
 Options:
 
