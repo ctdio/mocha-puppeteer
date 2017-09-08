@@ -75,6 +75,36 @@ module.exports = {
 }
 ```
 
+You can also get test coverage information using `nyc`
+
+```bash
+npx nyc mocha-puppeteer ./test/*.js
+```
+
+## Configuring tests
+You can configure `mocha-puppeteer` with a `.mocha-puppeteer-config.js` file.
+
+Example config file:
+
+```js
+require('require-self-ref')
+
+module.exports = {
+  lassoConfig: {
+    require: {
+      transforms: [
+        {
+          transform: require('lasso-babel-transform'),
+          config: {
+            extensions: ['.js', '.es6']
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
 At the moment, only options for configuring `lasso` are supported with the `lassoConfig` field.
 Babel transforms can be applied using the [lasso-babel-transform](https://github.com/lasso-js/lasso-babel-transform) module.
 
