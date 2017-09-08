@@ -424,3 +424,44 @@ test('should throw an error if no test options are provided', async (t) => {
     t.true(err.message.includes('options must be provided'))
   }
 })
+
+test('should emit error if page emits pageerror', async (t) => {
+  t.plan(0)
+
+  const {
+    testRunner,
+    mockPage
+  } = t.context
+
+  const testErrorMessage = 'hello'
+
+  const testRunnerErrorPromise = waitForEvent(testRunner, 'error', (error) => {
+    return error.message === testErrorMessage
+  })
+
+  await testRunner.start()
+  mockPage.emit('pageerror', new Error(testErrorMessage))
+
+  return testRunnerErrorPromise
+})
+
+test('should emit error if page emits error', async (t) => {
+  t.plan(0)
+
+  const {
+    testRunner,
+    mockPage
+  } = t.context
+
+  const testErrorMessage = 'hello'
+
+  const testRunnerErrorPromise = waitForEvent(testRunner, 'error', (error) => {
+    return error.message === testErrorMessage
+  })
+
+  await testRunner.start()
+  mockPage.on('error', () => {})
+  mockPage.emit('error', new Error(testErrorMessage))
+
+  return testRunnerErrorPromise
+})
