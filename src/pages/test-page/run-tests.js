@@ -1,4 +1,4 @@
-const { Mocha, WebSocket, superagent, location } = window
+const { mocha, Mocha, WebSocket, superagent, location } = window
 const { hostname, port } = location
 
 // end test if not started within one second
@@ -28,7 +28,7 @@ socket.addEventListener('open', () => {
     oldConsoleLog(...args)
   }
 
-  const runner = window.mocha.run()
+  const runner = mocha.run()
 
   let testsPassed = true
 

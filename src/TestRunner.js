@@ -22,6 +22,12 @@ const Server = require('./Server')
 
 const _prepareTestPageInput = require('./utils/prepareTestPageInput')
 
+const DEFAULT_MOCHA_OPTIONS = {
+  ui: 'bdd',
+  reporter: 'spec',
+  useColors: true
+}
+
 class TestRunner extends EventEmitter {
   constructor (options) {
     super()
@@ -36,11 +42,14 @@ class TestRunner extends EventEmitter {
     const {
       testFiles,
       lassoConfig,
+      mochaOptions,
 
       // test options
       _instrumentCode,
       _randomizeOutputDir
     } = options
+
+    this._mochaOptions = mochaOptions
 
     assert(Array.isArray(testFiles), 'testFiles must be provided as an array')
 
@@ -108,6 +117,10 @@ class TestRunner extends EventEmitter {
     const server = this._server
     await server.listen()
 
+    // config mocha options
+    const mochaOptions = Object.assign({},
+      DEFAULT_MOCHA_OPTIONS, this._mochaOptions)
+
     const browser = this._browser = await puppeteer.launch()
     const page = await browser.newPage()
 
@@ -120,7 +133,8 @@ class TestRunner extends EventEmitter {
     // for cleaner output
     page.setViewport({ width: columns, height: columns })
 
-    await page.goto(`http://localhost:${server.getPort()}`)
+    await page.goto(`http://localhost:${server.getPort()}` +
+      `#${JSON.stringify({ mochaOptions })}`)
   }
 }
 

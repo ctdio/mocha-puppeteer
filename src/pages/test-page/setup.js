@@ -1,7 +1,7 @@
-// TODO: Make these options configurable
+const { mocha, location } = window
 
-const { mocha } = window
+// parse query to get mocha options
+const hashData = location.hash.substring(1)
+const { mochaOptions } = JSON.parse(hashData)
 
-mocha.setup('bdd')
-mocha.reporter('spec')
-mocha.useColors(true)
+mocha.setup(mochaOptions)

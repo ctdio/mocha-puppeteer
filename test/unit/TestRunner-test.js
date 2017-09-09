@@ -12,6 +12,12 @@ const EventEmitter = require('events')
 
 const uuid = require('uuid')
 
+const DEFAULT_MOCHA_OPTIONS = {
+  ui: 'bdd',
+  reporter: 'spec',
+  useColors: true
+}
+
 class MockPage extends EventEmitter {
   async goto (url) {
     await superagent.get(url).send()
@@ -102,7 +108,51 @@ test('should direct puppeteer page to "goto" the root path of the ' +
   const server = testRunner._server
   const port = server.getPort()
 
-  sandbox.assert.calledWith(gotoSpy, `http://localhost:${port}`)
+  sandbox.assert.calledWith(gotoSpy, sandbox.match((url) =>
+    url.startsWith(`http://localhost:${port}#`)))
+})
+
+async function _testMochaOptions (context, inputOptions, expectedOptions) {
+  const {
+    sandbox,
+    mockPage,
+    TestRunner
+  } = context
+
+  const gotoSpy = sandbox.spy(mockPage, 'goto')
+
+  const testRunner = new TestRunner({
+    testFiles: [],
+    mochaOptions: inputOptions
+  })
+
+  await testRunner.start()
+
+  const server = testRunner._server
+  const port = server.getPort()
+
+  sandbox.assert.calledWith(gotoSpy, `http://localhost:${port}` +
+    `#${JSON.stringify(expectedOptions)}`)
+}
+
+test('should apply default mochaOptions as part of query in url passed to "goto" ' +
+'the root path of the server that is launched', async (t) => {
+  t.plan(0)
+
+  await _testMochaOptions(t.context, null, { mochaOptions: DEFAULT_MOCHA_OPTIONS })
+})
+
+test('should apply mochaOptions as part of query in url passed to "goto" ' +
+'the root path of the server that is launched', async (t) => {
+  t.plan(0)
+
+  const mochaOptions = {
+    ui: 'tdd',
+    reporter: 'nyan',
+    useColors: false
+  }
+
+  await _testMochaOptions(t.context, mochaOptions, { mochaOptions })
 })
 
 test('should fail to start if unable to start puppeteer', async (t) => {
