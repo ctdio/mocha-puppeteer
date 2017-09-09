@@ -4,14 +4,6 @@ const _loadConfig = require('./src/utils/loadConfig')
 
 const mochaPuppeteerPkgVersion = require('./package.json').version
 
-// pick specific values from config
-function _pickConfig (config) {
-  /* eslint-disable */
-  // TODO: Add more fields to pick (ex. puppeteerOptions)
-  return ({ lassoConfig } = config)
-  /* eslint-enable */
-}
-
 const parser = argly
   .createParser({
     '--help -h': {
@@ -25,6 +17,18 @@ const parser = argly
     '--pattern -p *': {
       type: 'string',
       description: 'Pattern to run tests. Either a single file or glob pattern.'
+    },
+    '--reporter': {
+      type: 'string',
+      description: 'The mocha test reporter to use. (Defaults to "spec")'
+    },
+    '--useColors': {
+      type: 'boolean',
+      description: 'Whether use colors for test output. (Defaults to true)'
+    },
+    '--ui': {
+      type: 'string',
+      description: 'The mocha ui to use. (Defaults to "bdd")'
     }
   })
   .example('Test a single file: "mocha-puppeteer /foo/bar-test.js"')
@@ -47,7 +51,12 @@ module.exports = async function runCli () {
   const {
     pattern,
     help,
-    version
+    version,
+
+    // mocha options (TODO: add more)
+    reporter,
+    useColors,
+    ui
   } = parser.parse()
 
   // Gracefully exit if either the "help" or "version" arguments are supplied
@@ -55,17 +64,31 @@ module.exports = async function runCli () {
   if (help || version || !pattern) return
 
   try {
+    let mochaOptions = {}
+    let lassoConfig = {}
+
     const config = await _loadConfig({
       startingDirectory: process.cwd()
     })
 
-    const options = config ? _pickConfig(config) : {}
+    if (config) {
+      config.mochaOptions && (mochaOptions = config.mochaOptions)
+      config.lassoConfig && (lassoConfig = config.lassoConfig)
+    }
 
-    Object.assign(options, { testFiles: [ pattern ] })
+    // apply cli overrides
+    reporter !== undefined && (mochaOptions.reporter = reporter)
+    useColors !== undefined && (mochaOptions.useColors = useColors)
+    ui !== undefined && (mochaOptions.ui = ui)
+
+    const options = Object.assign({
+      mochaOptions,
+      lassoConfig
+    }, { testFiles: [ pattern ] })
 
     await mochaPuppeteer.runTests(options)
   } catch (err) {
-    console.error(err.message)
+    console.error(err)
     process.exit(1)
   }
 }
