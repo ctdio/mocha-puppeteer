@@ -15,7 +15,7 @@ const parser = argly
       description: 'Show the version number of mocha-puppeteer'
     },
     '--pattern -p *': {
-      type: 'string',
+      type: 'string[]',
       description: 'Pattern to run tests. Either a single file or glob pattern.'
     },
     '--reporter': {
@@ -34,6 +34,7 @@ const parser = argly
   .example('Test a single file: "mocha-puppeteer /foo/bar-test.js"')
   .example('Test a series of files using a glob pattern: "mocha-puppeteer /foo/*/*-test.js"')
   .validate(function (result) {
+    console.log('result', result)
     if (result.help) {
       this.printUsage()
     } else if (result.version) {
@@ -84,11 +85,10 @@ module.exports = async function runCli () {
     const options = Object.assign({
       mochaOptions,
       lassoConfig
-    }, { testFiles: [ pattern ] })
+    }, { testFiles: pattern })
 
     await mochaPuppeteer.runTests(options)
   } catch (err) {
-    console.error(err)
-    process.exit(1)
+    throw err
   }
 }
