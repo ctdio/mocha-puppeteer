@@ -34,7 +34,6 @@ const parser = argly
   .example('Test a single file: "mocha-puppeteer /foo/bar-test.js"')
   .example('Test a series of files using a glob pattern: "mocha-puppeteer /foo/*/*-test.js"')
   .validate(function (result) {
-    console.log('result', result)
     if (result.help) {
       this.printUsage()
     } else if (result.version) {

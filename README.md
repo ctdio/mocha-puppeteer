@@ -53,6 +53,13 @@ Options:
   --version -v Show the version number of mocha-puppeteer [string]
 
 --pattern -p * Pattern to run tests. Either a single file or glob pattern. [string]
+
+    --reporter The mocha test reporter to use. (Defaults to "spec") [string]
+
+   --useColors Whether use colors for test output. (Defaults to true) [boolean]
+
+          --ui The mocha ui to use. (Defaults to "bdd") [string]
+
 ```
 
 ## Configuring the test file
