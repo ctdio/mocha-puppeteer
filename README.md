@@ -22,6 +22,18 @@ npm i -D mocha-puppeteer
 
 ## Usage
 
+Write your tests like you normally would with mocha.
+
+```js
+const assert = require('assert')
+
+describe('my test', () => {
+  it('should pass', () => {
+    assert(1 + 1 === 2)
+  })
+})
+```
+
 To run your tests, you can pass in the test files to the exposed cli tool. A glob works too depending
 on the shell you are using.
 
