@@ -18,15 +18,15 @@ const parser = argly
       type: 'string[]',
       description: 'Pattern to run tests. Either a single file or glob pattern.'
     },
-    '--reporter': {
+    '--reporter -r': {
       type: 'string',
       description: 'The mocha test reporter to use. (Defaults to "spec")'
     },
-    '--useColors': {
+    '--useColors -c': {
       type: 'boolean',
       description: 'Whether use colors for test output. (Defaults to true)'
     },
-    '--ui': {
+    '--ui -u': {
       type: 'string',
       description: 'The mocha ui to use. (Defaults to "bdd")'
     }
