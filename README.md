@@ -14,6 +14,10 @@ This module makes it possible to easily run tests written with [mocha](https://g
 inside of a Chromium instance. Module bundling is automatically handled using
 [lasso](https://github.com/lasso-js/lasso).
 
+<p align='center'>
+  <img src='https://media.giphy.com/media/3ov9k8gttSM4buyZna/giphy.gif'/>
+</p>
+
 ## Installation
 
 ```bash
