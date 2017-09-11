@@ -41,8 +41,9 @@ class TestRunner extends EventEmitter {
 
     const {
       testFiles,
-      lassoConfig,
       mochaOptions,
+      lassoConfig,
+      lassoDependencies,
 
       // test options
       _instrumentCode,
@@ -52,6 +53,9 @@ class TestRunner extends EventEmitter {
     this._mochaOptions = mochaOptions
 
     assert(Array.isArray(testFiles), 'testFiles must be provided as an array')
+    if (lassoDependencies) {
+      assert(Array.isArray(lassoDependencies), 'lassoDependencies must be provided as an array')
+    }
 
     // use output dir from lasso config if present
     const outputDir = (lassoConfig && lassoConfig.outputDir) ||
@@ -65,6 +69,7 @@ class TestRunner extends EventEmitter {
       outputDir,
       instrumentCode,
       lassoConfig,
+      lassoDependencies,
       testFiles
     })
 

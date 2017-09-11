@@ -1,5 +1,6 @@
 const lasso = require('lasso')
 const path = require('path')
+const resolveFrom = require('resolve-from')
 
 const DEFAULT_LASSO_CONFIG = {
   minify: false,
@@ -38,6 +39,31 @@ function _buildConfig ({ outputDir, inputConfig, instrumentCode }) {
   return config
 }
 
+// adapted from marko-cli
+function _resolveDependencies (inputDependencies) {
+  return inputDependencies.map((dependency) => {
+    let path
+
+    if (typeof dependency === 'string') {
+      let type
+      [ type, path ] = dependency.split(':').map((str) => str.trim())
+
+      if (!path) {
+        path = type
+        type = null
+      }
+
+      path = resolveFrom(process.cwd(), path)
+
+      dependency = type ? `${type}: ${path}` : path
+    } else if ((path = dependency.path)) {
+      dependency.path = resolveFrom(process.cwd(), path)
+    }
+
+    return dependency
+  })
+}
+
 module.exports = function _prepareTestPageInput (options) {
   const {
     outputDir,
@@ -45,6 +71,14 @@ module.exports = function _prepareTestPageInput (options) {
     lassoConfig: inputConfig,
     testFiles
   } = options
+
+  let {
+    lassoDependencies: inputDependencies
+  } = options
+
+  inputDependencies = inputDependencies
+    ? _resolveDependencies(inputDependencies)
+    : []
 
   const fullConfig = _buildConfig({
     outputDir,
@@ -57,7 +91,7 @@ module.exports = function _prepareTestPageInput (options) {
   const tests = testFiles.map((file) =>
     `require-run: ${require.resolve(path.resolve(file))}`)
 
-  const dependencies = [
+  const dependencies = inputDependencies.concat([
     'mocha/mocha.css',
     'mocha/mocha.js',
     'superagent/superagent.js',
@@ -67,7 +101,7 @@ module.exports = function _prepareTestPageInput (options) {
     ...tests,
 
     `require-run: ${require.resolve('../pages/test-page/run-tests')}`
-  ]
+  ])
 
   return {
     pageLasso,

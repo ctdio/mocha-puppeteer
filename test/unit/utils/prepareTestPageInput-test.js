@@ -138,3 +138,58 @@ test('should add istanbul instrumentation to lassoConfig ' +
 
   mockLasso.verify()
 })
+
+test('should resolve relative input dependencies', (t) => {
+  const { prepareTestPageInput } = t.context
+
+  const lassoDependencies = [
+    'require: ./src/TestRunner'
+  ]
+
+  const expectedPath = `${process.cwd()}/src/TestRunner.js`
+
+  const { dependencies } = prepareTestPageInput({
+    testFiles: [],
+    lassoDependencies
+  })
+
+  t.is(dependencies[0], `require: ${expectedPath}`)
+})
+
+test('should resolve relative input dependencies defined in object form', (t) => {
+  const { prepareTestPageInput } = t.context
+
+  const lassoDependencies = [
+    {
+      type: 'require',
+      path: './src/TestRunner'
+    }
+  ]
+
+  const expectedPath = `${process.cwd()}/src/TestRunner.js`
+
+  const { dependencies } = prepareTestPageInput({
+    testFiles: [],
+    lassoDependencies
+  })
+
+  t.deepEqual(dependencies[0], {
+    type: 'require',
+    path: expectedPath
+  })
+})
+
+test('should resolve relative input dependencies defined in object form', (t) => {
+  const { prepareTestPageInput } = t.context
+
+  const lassoDependencies = [ './src/TestRunner' ]
+
+  const expectedPath = `${process.cwd()}/src/TestRunner.js`
+
+  const { dependencies } = prepareTestPageInput({
+    testFiles: [],
+    lassoDependencies
+  })
+
+  t.is(dependencies[0], expectedPath)
+})

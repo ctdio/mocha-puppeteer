@@ -86,18 +86,23 @@ Example config file:
 require('require-self-ref')
 
 module.exports = {
+  mochaOptions: {
+    reporter: 'nyan'
+  },
+
   lassoConfig: {
     require: {
       transforms: [
         {
-          transform: require('lasso-babel-transform'),
-          config: {
-            extensions: ['.js', '.es6']
-          }
+          transform: 'lasso-babel-transform'
         }
       ]
     }
-  }
+  },
+
+  lassoDependencies: [
+    'src/theme/browser.json'
+  ]
 }
 ```
 
@@ -107,32 +112,13 @@ You can also get test coverage information using `nyc`
 npx nyc mocha-puppeteer ./test/*.js
 ```
 
-## Configuring tests
-You can configure `mocha-puppeteer` with a `.mocha-puppeteer-config.js` file.
-
-Example config file:
-
-```js
-require('require-self-ref')
-
-module.exports = {
-  lassoConfig: {
-    require: {
-      transforms: [
-        {
-          transform: require('lasso-babel-transform'),
-          config: {
-            extensions: ['.js', '.es6']
-          }
-        }
-      ]
-    }
-  }
-}
-```
-
-At the moment, only options for configuring `lasso` are supported with the `lassoConfig` field.
+At the moment, you can specify `mochaOptions`, `lassoConfig`, and `lassoDependencies`. `lassoDependencies` will be included before
+test files. So any globals
 Babel transforms can be applied using the [lasso-babel-transform](https://github.com/lasso-js/lasso-babel-transform) module.
+
+Note: Values provided in the `mochaOptions` field will be overridden by cli arguments.
+For example, `mocha-puppeteer test/test.js --reporter dot` will override the `reporter` option in the
+above config.
 
 ## Contributing
 

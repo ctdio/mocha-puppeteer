@@ -40,7 +40,7 @@ module.exports = async function _loadConfig ({ startingDirectory, verbose }) {
     try {
       config = require(configPath)
     } catch (err) {
-      throw new Error(`Unable to load config at ${configPath}`)
+      throw new Error(`Unable to load config at ${configPath}: ${err.stack}`)
     }
   }
 

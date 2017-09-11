@@ -66,6 +66,7 @@ module.exports = async function runCli () {
   try {
     let mochaOptions = {}
     let lassoConfig = {}
+    let lassoDependencies = []
 
     const config = await _loadConfig({
       startingDirectory: process.cwd()
@@ -74,6 +75,7 @@ module.exports = async function runCli () {
     if (config) {
       config.mochaOptions && (mochaOptions = config.mochaOptions)
       config.lassoConfig && (lassoConfig = config.lassoConfig)
+      config.lassoDependencies && (lassoDependencies = config.lassoDependencies)
     }
 
     // apply cli overrides
@@ -83,7 +85,8 @@ module.exports = async function runCli () {
 
     const options = Object.assign({
       mochaOptions,
-      lassoConfig
+      lassoConfig,
+      lassoDependencies
     }, { testFiles: pattern })
 
     await mochaPuppeteer.runTests(options)

@@ -515,3 +515,21 @@ test('should emit error if page emits error', async (t) => {
 
   return testRunnerErrorPromise
 })
+
+test('should throw error if lassoDependencies are not supplied as an array', async (t) => {
+  t.plan(1)
+
+  const {
+    TestRunner
+  } = t.context
+
+  try {
+    const testRunner = new TestRunner({
+      testFiles: [],
+      lassoDependencies: 'not an array'
+    })
+    testRunner.start()
+  } catch (err) {
+    t.true(err.message.includes('lassoDependencies must be provided as an array'))
+  }
+})
