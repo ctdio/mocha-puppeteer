@@ -36,7 +36,7 @@ socket.addEventListener('open', () => {
     testsPassed = false
   })
 
-  runner.once('start', () => {
+  runner.once('suite', () => {
     clearTimeout(testTimeout)
   })
 
