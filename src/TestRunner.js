@@ -44,6 +44,7 @@ class TestRunner extends EventEmitter {
       mochaOptions,
       lassoConfig,
       lassoDependencies,
+      puppeteerLaunchOptions,
 
       // test options
       _instrumentCode,
@@ -51,6 +52,7 @@ class TestRunner extends EventEmitter {
     } = options
 
     this._mochaOptions = mochaOptions
+    this._puppeteerLaunchOptions = puppeteerLaunchOptions
 
     assert(Array.isArray(testFiles), 'testFiles must be provided as an array')
     if (lassoDependencies) {
@@ -126,7 +128,7 @@ class TestRunner extends EventEmitter {
     const mochaOptions = Object.assign({},
       DEFAULT_MOCHA_OPTIONS, this._mochaOptions)
 
-    const browser = this._browser = await puppeteer.launch()
+    const browser = this._browser = await puppeteer.launch(this._puppeteerLaunchOptions)
     const page = await browser.newPage()
 
     page.on('error', (err) => this.emit('error', err))

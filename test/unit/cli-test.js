@@ -48,6 +48,7 @@ function _prepareArgumentParser (options) {
     parse () {
       if (parseError) {
         errorCallback.apply(parser, [ parseError ])
+        return
       }
       validateCallback.apply(parser, [ parseOutput ])
       return parseOutput
@@ -269,6 +270,26 @@ test('should throw an error upon parsing if there is an issue', async (t) => {
   try {
     await runCli()
   } catch (err) {
-    t.true(err.message.includes('Error parsing'))
+    t.is(err.message, 'Failed to parse args')
   }
+})
+
+test('should prefix Chromium args with double dashes', async (t) => {
+  t.plan(1)
+  const { sandbox } = t.context
+  const loadConfigSpy = sandbox.stub()
+
+  const runCli = _prepareArgumentParser({
+    sandbox,
+    parseOutput: {
+      pattern: TEST_PATTERN,
+      args: [ 'accept-resource-provider', 'account-consistency' ]
+    },
+    loadConfigFunc: loadConfigSpy,
+    runTestsFunc (options) {
+      t.deepEqual(options.puppeteerLaunchOptions.args, [ '--accept-resource-provider', '--account-consistency' ])
+    }
+  })
+
+  await runCli()
 })

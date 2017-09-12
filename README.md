@@ -62,20 +62,44 @@ Examples:
 
    Test a series of files using a glob pattern: "mocha-puppeteer /foo/*/*-test.js"
 
+   Test using Chromium args: "mocha-puppeteer /foo/bar-test.js --args account-consistency browser-startup-dialog"
+
 Options:
 
-     --help -h Show this help message [string]
+             --help -h Show this help message [string]
 
-  --version -v Show the version number of mocha-puppeteer [string]
+          --version -v Show the version number of mocha-puppeteer [string]
 
---pattern -p * Pattern to run tests. Either a single file or glob pattern. [string]
+        --pattern -p * Pattern to run tests. Either a single file or glob pattern. [string]
 
- --reporter -r The mocha test reporter to use. (Defaults to "spec") [string]
+         --reporter -r The mocha test reporter to use. (Defaults to "spec") [string]
 
---useColors -c Whether use colors for test output. (Defaults to true) [boolean]
+        --useColors -c Whether use colors for test output. (Defaults to true) [boolean]
 
-       --ui -u The mocha ui to use. (Defaults to "bdd") [string]
+               --ui -u The mocha ui to use. (Defaults to "bdd") [string]
+
+--ignoreHTTPSErrors -i Whether to ignore HTTPS errors during navigation. Defaults to false. [boolean]
+
+         --headless -H Whether to run Chromium in headless mode. Defaults to true. [boolean]
+
+   --executablePath -e Path to a Chromium executable to run instead of bundled Chromium. If executablePath is a relative path, then it is resolved relative to current working directory. [string]
+
+           --slowMo -s Slows down Puppeteer operations by the specified amount of milliseconds. Useful so that you can see what is going on. [number]
+
+             --args -a Additional arguments to pass to the Chromium instance. List of Chromium flags can be found at https://peter.sh/experiments/chromium-command-line-switches/. [string]
+
+     --handleSIGINT -S Close chrome process on Ctrl-C. Defaults to true. [boolean]
+
+          --timeout -t Maximum time in milliseconds to wait for the Chrome instance to start. Defaults to 30000 (30 seconds). Pass 0 to disable timeout. [number]
+
+           --dumpio -d Whether to pipe browser process stdout and stderr into process.stdout and process.stderr. Defaults to false. [boolean]
+
+      --userDataDir -D Path to a User Data Directory. [string]
 ```
+
+> NOTE: To use `args` [Chromium flags](https://peter.sh/experiments/chromium-command-line-switches/), do not supply the prefixed double dash.
+> Example of using `args`:
+> `mocha-puppeteer /foo/bar-test.js --args account-consistency browser-startup-dialog`
 
 ## Configuring the test file
 You can configure `mocha-puppeteer` with a `.mocha-puppeteer-config.js` file.
