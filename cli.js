@@ -29,10 +29,47 @@ const parser = argly
     '--ui -u': {
       type: 'string',
       description: 'The mocha ui to use. (Defaults to "bdd")'
+    },
+    '--ignoreHTTPSErrors -i': {
+      type: 'boolean',
+      description: 'Whether to ignore HTTPS errors during navigation. Defaults to false.'
+    },
+    '--headless -H': {
+      type: 'boolean',
+      description: 'Whether to run Chromium in headless mode. Defaults to true.'
+    },
+    '--executablePath -e': {
+      type: 'string',
+      description: 'Path to a Chromium executable to run instead of bundled Chromium. If executablePath is a relative path, then it is resolved relative to current working directory.'
+    },
+    '--slowMo -s': {
+      type: 'number',
+      description: 'Slows down Puppeteer operations by the specified amount of milliseconds. Useful so that you can see what is going on.'
+    },
+    '--args -a': {
+      type: 'string[]',
+      description: 'Additional arguments to pass to the Chromium instance. List of Chromium flags can be found at https://peter.sh/experiments/chromium-command-line-switches/.'
+    },
+    '--handleSIGINT -S': {
+      type: 'boolean',
+      description: 'Close chrome process on Ctrl-C. Defaults to true.'
+    },
+    '--puppeteerTimeout -t': {
+      type: 'number',
+      description: 'Maximum time in milliseconds to wait for the Chrome instance to start. Defaults to 30000 (30 seconds). Pass 0 to disable timeout.'
+    },
+    '--dumpio -d': {
+      type: 'boolean',
+      description: 'Whether to pipe browser process stdout and stderr into process.stdout and process.stderr. Defaults to false.'
+    },
+    '--userDataDir -D': {
+      type: 'string',
+      description: 'Path to a User Data Directory.'
     }
   })
   .example('Test a single file: "mocha-puppeteer /foo/bar-test.js"')
   .example('Test a series of files using a glob pattern: "mocha-puppeteer /foo/*/*-test.js"')
+  .example('Test using Chromium args: "mocha-puppeteer /foo/bar-test.js --args account-consistency browser-startup-dialog"')
   .validate(function (result) {
     if (result.help) {
       this.printUsage()
@@ -44,7 +81,7 @@ const parser = argly
   })
   .onError(function (err) {
     this.printUsage()
-    throw new Error('Error parsing command line args: ', err)
+    throw err
   })
 
 module.exports = async function runCli () {
@@ -56,12 +93,28 @@ module.exports = async function runCli () {
     // mocha options (TODO: add more)
     reporter,
     useColors,
-    ui
+    ui,
+    ignoreHTTPSErrors,
+    headless,
+    executablePath,
+    slowMo,
+    args,
+    handleSIGINT,
+    puppeteerTimeout,
+    dumpio,
+    userDataDir
   } = parser.parse()
 
   // Gracefully exit if either the "help" or "version" arguments are supplied
   // of if the "pattern" argument is missing because it's required.
   if (help || version || !pattern) return
+
+  let chromeArgs
+
+  if (args) {
+    // Normalize the extra Chromium flag arguments to be prefixed with a double dash
+    chromeArgs = args.map((arg) => '--' + arg)
+  }
 
   try {
     let mochaOptions = {}
@@ -86,7 +139,18 @@ module.exports = async function runCli () {
     const options = Object.assign({
       mochaOptions,
       lassoConfig,
-      lassoDependencies
+      lassoDependencies,
+      puppeteerLaunchOptions: {
+        ignoreHTTPSErrors,
+        headless,
+        executablePath,
+        slowMo,
+        args: chromeArgs,
+        handleSIGINT,
+        timeout: puppeteerTimeout,
+        dumpio,
+        userDataDir
+      }
     }, { testFiles: pattern })
 
     await mochaPuppeteer.runTests(options)

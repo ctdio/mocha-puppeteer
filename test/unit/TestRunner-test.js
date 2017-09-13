@@ -175,6 +175,36 @@ test('should fail to start if unable to start puppeteer', async (t) => {
   }
 })
 
+test('should call puppeteer launch with puppeteerLaunchOptions', async (t) => {
+  const {
+    sandbox,
+    mockPuppeteer,
+    mockFs
+  } = t.context
+
+  const TestRunner = proxyquire('~/src/TestRunner', {
+    puppeteer: mockPuppeteer,
+    fs: mockFs
+  })
+
+  const launchSpy = sandbox.spy(mockPuppeteer, 'launch')
+
+  const puppeteerLaunchOptions = {
+    headless: true
+  }
+
+  const testRunner = new TestRunner({
+    testFiles: [],
+    puppeteerLaunchOptions
+  })
+
+  t.deepEqual(testRunner._puppeteerLaunchOptions, puppeteerLaunchOptions)
+
+  await testRunner.start()
+
+  sandbox.assert.calledWith(launchSpy, puppeteerLaunchOptions)
+})
+
 test('should tear down server and browser upon ending test', async (t) => {
   t.plan(0)
 
