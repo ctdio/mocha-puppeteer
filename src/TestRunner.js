@@ -38,6 +38,7 @@ class TestRunner extends EventEmitter {
     this._httpServer = null
     this._webSocketServer = null
     this._browser = null
+    this._page = null
 
     const {
       testFiles,
@@ -133,7 +134,9 @@ class TestRunner extends EventEmitter {
       DEFAULT_MOCHA_OPTIONS, this._mochaOptions)
 
     const browser = this._browser = await puppeteer.launch(this._puppeteerLaunchOptions)
-    const page = await browser.newPage()
+    const page = this._page = await browser.newPage()
+
+    await page.exposeFunction('puppeteerCommand', this.executePageCommand.bind(this))
 
     page.on('error', (err) => this.emit('error', err))
     page.on('pageerror', (err) => this.emit('error', err))
@@ -146,6 +149,25 @@ class TestRunner extends EventEmitter {
 
     await page.goto(`http://localhost:${server.getPort()}` +
       `#${JSON.stringify({ mochaOptions })}`, this._puppeteerPageOptions)
+  }
+
+  async executePageCommand (command) {
+    assert(command, 'Executing "puppeteerCommand" requires options')
+
+    if (!this._page) {
+      throw new Error('Cannot execute page command because the page is not ready')
+    }
+
+    const { type, args } = command
+    assert(type, '"type" is a required property for executing a "puppeteerCommand"')
+
+    if (!this._page[type]) {
+      throw new Error(`Error executing page command. Invalid puppeteer page command "${type}".`)
+    }
+
+    if (args) return this._page[type](...args)
+
+    return this._page[type]()
   }
 }
 

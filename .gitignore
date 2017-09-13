@@ -1,6 +1,7 @@
 node_modules/
 .cache/
-static/
+test/integration/mocha/static/*
+!test/integration/mocha/static/.gitkeep
 
 .mocha-puppeteer*/
 

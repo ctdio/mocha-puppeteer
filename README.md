@@ -154,6 +154,25 @@ Note: Values provided in the `mochaOptions` field will be overridden by cli argu
 For example, `mocha-puppeteer test/test.js --reporter dot` will override the `reporter` option in the
 above config.
 
+## Executing page commands from tests
+
+[`puppeteer` page commands](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#class-page)
+can be executed using `window.puppeteerCommand` from your tests. For example,
+if you want to take a screenshot of the page:
+
+```js
+describe('screenshot test', function () {
+  it('should take a screenshot', async () => {
+    await window.puppeteerCommand({
+      type: 'screenshot', // The page command to run
+      args: [ {           // The arguments that should be passed to the page command
+        path: './test.png'
+      } ]
+    })
+  })
+})
+```
+
 ## Advanced Usage
 
 If you need to customize the page that is sent to the browser with your Mocha
