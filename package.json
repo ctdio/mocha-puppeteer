@@ -31,7 +31,8 @@
     "mocha": "^3.5.0",
     "puppeteer": "^0.9.0",
     "rimraf": "^2.6.1",
-    "superagent": "^3.6.0"
+    "superagent": "^3.6.0",
+    "uuid": "^3.1.0"
   },
   "devDependencies": {
     "ava": "^0.22.0",
@@ -47,8 +48,7 @@
     "nyc": "^11.1.0",
     "proxyquire": "^1.8.0",
     "require-self-ref": "^2.0.1",
-    "sinon": "^3.2.1",
-    "uuid": "^3.1.0"
+    "sinon": "^3.2.1"
   },
   "ava": {
     "require": [
