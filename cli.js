@@ -65,6 +65,10 @@ const parser = argly
     '--userDataDir -D': {
       type: 'string',
       description: 'Path to a User Data Directory.'
+    },
+    '--puppeteerPageTimeout': {
+      type: 'number',
+      description: 'Maximum time in milliseconds to wait for the page to load'
     }
   })
   .example('Test a single file: "mocha-puppeteer /foo/bar-test.js"')
@@ -102,7 +106,8 @@ module.exports = async function runCli () {
     handleSIGINT,
     puppeteerTimeout,
     dumpio,
-    userDataDir
+    userDataDir,
+    puppeteerPageTimeout
   } = parser.parse()
 
   // Gracefully exit if either the "help" or "version" arguments are supplied
@@ -150,6 +155,9 @@ module.exports = async function runCli () {
         timeout: puppeteerTimeout,
         dumpio,
         userDataDir
+      },
+      puppeteerPageOptions: {
+        timeout: puppeteerPageTimeout
       }
     }, { testFiles: pattern })
 

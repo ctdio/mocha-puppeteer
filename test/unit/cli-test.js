@@ -248,6 +248,31 @@ test('should exit the process if runTests throws an error' +
   }
 })
 
+test('should pass along the puppeteer page timeout', async (t) => {
+  t.plan(0)
+  const { sandbox } = t.context
+  const runTestsSpy = sandbox.spy()
+  const puppeteerPageTimeout = 123456
+
+  const runCli = _prepareArgumentParser({
+    sandbox,
+    parseOutput: {
+      pattern: TEST_PATTERN,
+      puppeteerPageTimeout
+    },
+    loadConfigFunc: sandbox.stub(),
+    runTestsFunc: runTestsSpy
+  })
+
+  await runCli()
+
+  sandbox.assert.calledOnce(runTestsSpy)
+
+  sandbox.assert.calledWith(runTestsSpy, sandbox.match(({ puppeteerPageOptions }) => {
+    return puppeteerPageOptions.timeout === puppeteerPageTimeout
+  }, 'puppeteerPageOptions.pageTimeout should match --puppeteerPageTimeout'))
+})
+
 test('should throw an error upon parsing if there is an issue', async (t) => {
   t.plan(1)
   const { sandbox } = t.context

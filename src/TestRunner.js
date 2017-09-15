@@ -45,6 +45,7 @@ class TestRunner extends EventEmitter {
       lassoConfig,
       lassoDependencies,
       puppeteerLaunchOptions,
+      puppeteerPageOptions,
 
       // test options
       _instrumentCode,
@@ -53,6 +54,7 @@ class TestRunner extends EventEmitter {
 
     this._mochaOptions = mochaOptions
     this._puppeteerLaunchOptions = puppeteerLaunchOptions
+    this._puppeteerPageOptions = puppeteerPageOptions
 
     assert(Array.isArray(testFiles), 'testFiles must be provided as an array')
     if (lassoDependencies) {
@@ -141,7 +143,7 @@ class TestRunner extends EventEmitter {
     page.setViewport({ width: columns, height: columns })
 
     await page.goto(`http://localhost:${server.getPort()}` +
-      `#${JSON.stringify({ mochaOptions })}`)
+      `#${JSON.stringify({ mochaOptions })}`, this._puppeteerPageOptions)
   }
 }
 

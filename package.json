@@ -9,7 +9,7 @@
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint",
-    "test": "nyc ava test/unit test/integration",
+    "test": "nyc ava",
     "test:unit": "nyc ava test/unit",
     "test:integration": "nyc ava test/integration",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
@@ -51,6 +51,10 @@
     "sinon": "^3.2.1"
   },
   "ava": {
+    "files": [
+      "test/**/*.js",
+      "!test/util/**/*.js"
+    ],
     "require": [
       "require-self-ref"
     ]

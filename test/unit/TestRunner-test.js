@@ -205,6 +205,37 @@ test('should call puppeteer launch with puppeteerLaunchOptions', async (t) => {
   sandbox.assert.calledWith(launchSpy, puppeteerLaunchOptions)
 })
 
+test('should call \'page.goto\' with puppeteerPageOptions', async (t) => {
+  const {
+    sandbox,
+    mockPuppeteer,
+    mockFs,
+    mockPage
+  } = t.context
+
+  const TestRunner = proxyquire('~/src/TestRunner', {
+    puppeteer: mockPuppeteer,
+    fs: mockFs
+  })
+
+  const gotoSpy = sandbox.spy(mockPage, 'goto')
+
+  const puppeteerPageOptions = {
+    pageTimeout: 1000
+  }
+
+  const testRunner = new TestRunner({
+    testFiles: [],
+    puppeteerPageOptions
+  })
+
+  t.deepEqual(testRunner._puppeteerPageOptions, puppeteerPageOptions)
+
+  await testRunner.start()
+
+  sandbox.assert.calledWith(gotoSpy, sandbox.match.string, puppeteerPageOptions)
+})
+
 test('should tear down server and browser upon ending test', async (t) => {
   t.plan(0)
 
