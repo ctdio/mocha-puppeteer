@@ -55,3 +55,17 @@ test('#runTests should reject if error occurs during test', async (t) => {
     t.pass(err)
   }
 })
+
+test('#runTests should allow using a custom Marko template', async (t) => {
+  try {
+    await runTests({
+      testFiles: [ require.resolve('./fixtures/passing-test.js') ],
+      testPage: require('./fixtures/test-page'),
+      _instrumentCode: false,
+      _randomizeOutputDir: true
+    })
+    t.pass()
+  } catch (err) {
+    t.fail(err)
+  }
+})

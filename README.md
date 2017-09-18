@@ -70,6 +70,8 @@ Options:
 
           --version -v Show the version number of mocha-puppeteer [string]
 
+     --testPagePath -P Path to a custom Marko test page [string]
+
         --pattern -p * Pattern to run tests. Either a single file or glob pattern. [string]
 
          --reporter -r The mocha test reporter to use. (Defaults to "spec") [string]
@@ -90,11 +92,13 @@ Options:
 
      --handleSIGINT -S Close chrome process on Ctrl-C. Defaults to true. [boolean]
 
-          --timeout -t Maximum time in milliseconds to wait for the Chrome instance to start. Defaults to 30000 (30 seconds). Pass 0 to disable timeout. [number]
+ --puppeteerTimeout -t Maximum time in milliseconds to wait for the Chrome instance to start. Defaults to 30000 (30 seconds). Pass 0 to disable timeout. [number]
 
            --dumpio -d Whether to pipe browser process stdout and stderr into process.stdout and process.stderr. Defaults to false. [boolean]
 
       --userDataDir -D Path to a User Data Directory. [string]
+
+--puppeteerPageTimeout Maximum time in milliseconds to wait for the page to load [number]
 ```
 
 > NOTE: To use `args` [Chromium flags](https://peter.sh/experiments/chromium-command-line-switches/), do not supply the prefixed double dash.
@@ -143,6 +147,31 @@ Babel transforms can be applied using the [lasso-babel-transform](https://github
 Note: Values provided in the `mochaOptions` field will be overridden by cli arguments.
 For example, `mocha-puppeteer test/test.js --reporter dot` will override the `reporter` option in the
 above config.
+
+## Advanced Usage
+
+If you need to customize the page that is sent to the browser with your Mocha
+test code, you can do so, by specifiying a `--testPagePath` CLI option.
+`mocha-puppeteer` uses [Marko.js](https://github.com/marko-js/marko) for
+templating and [Lasso](https://github.com/lasso-js/lasso) to bundle browser
+dependencies. Provide a path to a Marko template similar to the following:
+
+**/my-proj/test-page.marko**
+
+```marko
+lasso-page [
+  dependencies=input.dependencies
+  lasso=input.lasso
+]
+
+<!DOCTYPE html>
+html
+  head
+    lasso-head
+  body
+    div id='mocha'
+    lasso-body
+```
 
 ## Contributing
 

@@ -1,0 +1,19 @@
+lasso-page dependencies=input.dependencies lasso=input.lasso
+
+<!DOCTYPE html>
+html lang="en"
+    head
+        meta charset="UTF-8"
+        title -- Marko Components Tests
+        lasso-head
+    body
+
+        div id="test"
+        div id="mocha"
+        div id="testsTarget"
+
+        lasso-body
+
+        init-components immediate
+
+        lasso-slot name="mocha-run"

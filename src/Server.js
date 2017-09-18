@@ -13,7 +13,7 @@ const TestPage = marko.load(require('./pages/test-page'))
 const { Server: WebSocketServer } = require('ws')
 
 class Server extends EventEmitter {
-  constructor ({ outputDir, pageLasso, dependencies }) {
+  constructor ({ outputDir, pageLasso, dependencies, testPage }) {
     super()
 
     const app = this._app = new Koa()
@@ -21,11 +21,13 @@ class Server extends EventEmitter {
       middleware: [ bodyParser() ]
     })
 
+    testPage = (testPage && marko.load(testPage)) || TestPage
+
     router.get('/', async (ctx) => {
       this.emit('start')
       ctx.type = 'html'
 
-      ctx.body = TestPage.stream({
+      ctx.body = testPage.stream({
         lasso: pageLasso,
         dependencies
       })
