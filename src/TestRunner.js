@@ -46,6 +46,7 @@ class TestRunner extends EventEmitter {
       lassoDependencies,
       puppeteerLaunchOptions,
       puppeteerPageOptions,
+      testPage,
 
       // test options
       _instrumentCode,
@@ -80,7 +81,8 @@ class TestRunner extends EventEmitter {
     const server = this._server = new Server({
       outputDir,
       pageLasso,
-      dependencies
+      dependencies,
+      testPage
     })
 
     server.on('console', console.log)

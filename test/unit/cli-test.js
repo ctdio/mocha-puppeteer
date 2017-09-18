@@ -1,3 +1,4 @@
+const path = require('path')
 const test = require('ava')
 
 const sinon = require('sinon')
@@ -317,4 +318,44 @@ test('should prefix Chromium args with double dashes', async (t) => {
   })
 
   await runCli()
+})
+
+test('should allow passing valid Marko template path', async (t) => {
+  t.plan(1)
+  const { sandbox } = t.context
+  const loadConfigSpy = sandbox.stub()
+
+  const runCli = _prepareArgumentParser({
+    sandbox,
+    parseOutput: {
+      pattern: TEST_PATTERN,
+      testPagePath: path.resolve(__dirname, '../../src/pages/test-page/index.marko')
+    },
+    loadConfigFunc: loadConfigSpy,
+    runTestsFunc (options) {
+      t.deepEqual(options.testPage, require('~/src/pages/test-page/index.marko'))
+    }
+  })
+
+  await runCli()
+})
+
+test('should throw error if invalid test page path provided', async (t) => {
+  const { sandbox } = t.context
+
+  const loadConfigSpy = sandbox.stub()
+  const runTestsSpy = sandbox.stub()
+
+  const runCli = _prepareArgumentParser({
+    sandbox,
+    parseOutput: {
+      pattern: TEST_PATTERN,
+      testPagePath: 'INVALID_PATH'
+    },
+    loadConfigFunc: loadConfigSpy,
+    runTestsFunc: runTestsSpy
+  })
+
+  const err = await t.throws(runCli())
+  t.is(err.message, 'Invalid "testPagePath" provided: "INVALID_PATH"')
 })

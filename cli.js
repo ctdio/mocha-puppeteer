@@ -1,8 +1,19 @@
+require('marko/node-require').install()
+
 const argly = require('argly')
+const resolveFrom = require('resolve-from')
 const mochaPuppeteer = require('./index')
 const _loadConfig = require('./src/utils/loadConfig')
 
 const mochaPuppeteerPkgVersion = require('./package.json').version
+
+function _resolveTestPage (testPagePath) {
+  try {
+    return require(resolveFrom(process.cwd(), testPagePath))
+  } catch (err) {
+    throw new Error(`Invalid "testPagePath" provided: "${testPagePath}"`)
+  }
+}
 
 const parser = argly
   .createParser({
@@ -13,6 +24,10 @@ const parser = argly
     '--version -v': {
       type: 'string',
       description: 'Show the version number of mocha-puppeteer'
+    },
+    '--testPagePath -P': {
+      type: 'string',
+      description: 'Path to a custom Marko test page'
     },
     '--pattern -p *': {
       type: 'string[]',
@@ -107,7 +122,8 @@ module.exports = async function runCli () {
     puppeteerTimeout,
     dumpio,
     userDataDir,
-    puppeteerPageTimeout
+    puppeteerPageTimeout,
+    testPagePath
   } = parser.parse()
 
   // Gracefully exit if either the "help" or "version" arguments are supplied
@@ -141,10 +157,13 @@ module.exports = async function runCli () {
     useColors !== undefined && (mochaOptions.useColors = useColors)
     ui !== undefined && (mochaOptions.ui = ui)
 
+    const testPage = testPagePath ? _resolveTestPage(testPagePath) : undefined
+
     const options = Object.assign({
       mochaOptions,
       lassoConfig,
       lassoDependencies,
+      testPage,
       puppeteerLaunchOptions: {
         ignoreHTTPSErrors,
         headless,
