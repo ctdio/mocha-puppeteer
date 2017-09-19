@@ -11,6 +11,8 @@ const DEFAULT_LASSO_CONFIG = {
   fingerprintsEnabled: false
 }
 
+const FIXTURES_PATH = `${process.cwd()}/test/unit/util/fixtures`
+
 const ISTANBUL_CONFIG = Object.assign({}, DEFAULT_LASSO_CONFIG)
 ISTANBUL_CONFIG.require = {
   transforms: [
@@ -192,4 +194,52 @@ test('should resolve relative input dependencies defined in object form', (t) =>
   })
 
   t.is(dependencies[0], expectedPath)
+})
+
+test('should walk directories passed in as testFiles', (t) => {
+  const { prepareTestPageInput } = t.context
+  const testDir = `${FIXTURES_PATH}/test-directory`
+  const expectedTestPath = `${testDir}/test.js`
+  const expectedNestedTestPath = `${testDir}/nested-dir/test.js`
+
+  const { dependencies } = prepareTestPageInput({
+    testFiles: [ testDir ]
+  })
+
+  t.true(dependencies.indexOf(`require-run: ${expectedTestPath}`) > -1)
+  t.true(dependencies.indexOf(`require-run: ${expectedNestedTestPath}`) > -1)
+})
+
+test('should be able to pick up both tests files and directories', (t) => {
+  const { prepareTestPageInput } = t.context
+  const nestedTestDir = `${FIXTURES_PATH}/test-directory/nested-dir`
+  const expectedTestPath = `${nestedTestDir}/test.js`
+  const directTestPath = `${FIXTURES_PATH}/test-directory/test.js`
+
+  const { dependencies } = prepareTestPageInput({
+    testFiles: [ nestedTestDir, directTestPath ]
+  })
+
+  t.true(dependencies.indexOf(`require-run: ${directTestPath}`) > -1)
+  t.true(dependencies.indexOf(`require-run: ${expectedTestPath}`) > -1)
+})
+
+test('should only pick up files with commonly used js extensions (jsx, js, mjs, es6)', (t) => {
+  const { prepareTestPageInput } = t.context
+  const extensionsDir = `${FIXTURES_PATH}/extensions`
+  const testFileBase = `${extensionsDir}/test`
+
+  const es6TestPath = `${testFileBase}.es6`
+  const jsTestPath = `${testFileBase}.js`
+  const jsxTestPath = `${testFileBase}.jsx`
+  const mjsTestPath = `${testFileBase}.mjs`
+
+  const { dependencies } = prepareTestPageInput({
+    testFiles: [ extensionsDir ]
+  })
+
+  t.true(dependencies.indexOf(`require-run: ${es6TestPath}`) > -1)
+  t.true(dependencies.indexOf(`require-run: ${jsTestPath}`) > -1)
+  t.true(dependencies.indexOf(`require-run: ${jsxTestPath}`) > -1)
+  t.true(dependencies.indexOf(`require-run: ${mjsTestPath}`) > -1)
 })

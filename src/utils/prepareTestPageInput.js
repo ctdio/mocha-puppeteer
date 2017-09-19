@@ -1,6 +1,13 @@
 const lasso = require('lasso')
 const path = require('path')
+const { statSync } = require('fs')
+const { walkSync } = require('fs-walk')
 const resolveFrom = require('resolve-from')
+
+const TEST_FILE_EXTENSIONS = {}
+;[ 'js', 'jsx', 'es6', 'mjs' ].map((extension) => {
+  TEST_FILE_EXTENSIONS[extension] = true
+})
 
 const DEFAULT_LASSO_CONFIG = {
   minify: false,
@@ -64,6 +71,31 @@ function _resolveDependencies (inputDependencies) {
   })
 }
 
+function _buildTestFiles (inputTestFiles) {
+  const testFiles = []
+
+  inputTestFiles.map((testFile) => {
+    const filePath = path.resolve(process.cwd(), testFile)
+    const stat = statSync(filePath)
+
+    if (stat.isDirectory()) {
+      walkSync(filePath, (baseDir, fileName, stat) => {
+        if (stat.isFile()) {
+          const extension = fileName.substring(fileName.lastIndexOf('.') + 1)
+
+          if (TEST_FILE_EXTENSIONS[extension]) {
+            testFiles.push(`require-run: ${path.join(baseDir, fileName)}`)
+          }
+        }
+      })
+    } else if (stat.isFile()) {
+      testFiles.push(`require-run: ${filePath}`)
+    }
+  })
+
+  return testFiles
+}
+
 module.exports = function _prepareTestPageInput (options) {
   const {
     outputDir,
@@ -88,8 +120,7 @@ module.exports = function _prepareTestPageInput (options) {
 
   const pageLasso = lasso.create(fullConfig)
 
-  const tests = testFiles.map((file) =>
-    `require-run: ${require.resolve(path.resolve(file))}`)
+  const tests = _buildTestFiles(testFiles)
 
   const dependencies = inputDependencies.concat([
     'mocha/mocha.css',
