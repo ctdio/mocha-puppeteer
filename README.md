@@ -45,6 +45,12 @@ on the shell you are using.
 npx mocha-puppeteer ./tests/dirA/*.js ./test/dirB/*.js
 ```
 
+You can also just pass in a directory containing all of the tests you want to run.
+
+```bash
+npx mocha-puppeteer ./tests
+```
+
 You can also get test coverage information using `nyc`
 
 ```bash
