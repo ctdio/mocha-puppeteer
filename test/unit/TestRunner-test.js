@@ -23,6 +23,10 @@ class MockPage extends EventEmitter {
     await superagent.get(url).send()
   }
 
+  async exposeFunction () {}
+
+  async screenshot () {}
+
   setViewport () {}
 }
 
@@ -593,4 +597,80 @@ test('should throw error if lassoDependencies are not supplied as an array', asy
   } catch (err) {
     t.true(err.message.includes('lassoDependencies must be provided as an array'))
   }
+})
+
+test('should execute a page command', async (t) => {
+  t.plan(0)
+
+  const { testRunner, mockPage, sandbox } = t.context
+
+  const pageScreenshotStub = sandbox.stub(mockPage, 'screenshot')
+
+  const pageCommandOptions = {
+    type: 'screenshot',
+    args: [ {
+      path: 'test.png'
+    } ]
+  }
+
+  await testRunner.start()
+  await testRunner.executePageCommand(pageCommandOptions)
+
+  sinon.assert.calledWithExactly(pageScreenshotStub, pageCommandOptions.args[0])
+})
+
+test('should execute a page command without args', async (t) => {
+  t.plan(0)
+
+  const { testRunner, mockPage, sandbox } = t.context
+
+  const pageScreenshotStub = sandbox.stub(mockPage, 'screenshot')
+
+  const pageCommandOptions = {
+    type: 'screenshot'
+  }
+
+  await testRunner.start()
+  await testRunner.executePageCommand(pageCommandOptions)
+
+  sinon.assert.calledWithExactly(pageScreenshotStub)
+})
+
+test('should throw error if attempting to execute a page command when the page is not ready', async (t) => {
+  const { testRunner } = t.context
+
+  const error = await t.throws(
+    testRunner.executePageCommand({ type: 'screenshot' }))
+
+  t.is(error.message, 'Cannot execute page command because the page is not ready')
+})
+
+test('should throw error if attempting to execute a page command without options', async (t) => {
+  const { testRunner } = t.context
+
+  await testRunner.start()
+
+  const error = await t.throws(testRunner.executePageCommand())
+
+  t.is(error.message, 'Executing "puppeteerCommand" requires options')
+})
+
+test('should throw error if attempting to execute a page command without a "type"', async (t) => {
+  const { testRunner } = t.context
+
+  await testRunner.start()
+
+  const error = await t.throws(testRunner.executePageCommand({}))
+
+  t.is(error.message, '"type" is a required property for executing a "puppeteerCommand"')
+})
+
+test('should not allow executing page commands that do not exist', async (t) => {
+  const { testRunner } = t.context
+
+  await testRunner.start()
+
+  const error = await t.throws(testRunner.executePageCommand({ type: 'INVALID_PAGE_COMMAND' }))
+
+  t.is(error.message, 'Error executing page command. Invalid puppeteer page command "INVALID_PAGE_COMMAND".')
 })

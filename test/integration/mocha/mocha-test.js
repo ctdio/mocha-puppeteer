@@ -1,3 +1,8 @@
+const { promisify } = require('util')
+const fs = require('fs')
+const path = require('path')
+const fsUnlinkAsync = promisify(fs.unlink)
+const fsStatAsync = promisify(fs.stat)
 const test = require('ava')
 const { runTests } = require('~/index')
 
@@ -8,6 +13,24 @@ test('#runTests should resolve for passing tests', async (t) => {
       _instrumentCode: false,
       _randomizeOutputDir: true
     })
+    t.pass()
+  } catch (err) {
+    t.fail(err)
+  }
+})
+
+test('#runTests should allow taking screenshot from tests', async (t) => {
+  const imgPath = path.resolve(__dirname, 'static', 'test.png')
+
+  try {
+    await runTests({
+      testFiles: [ require.resolve('./fixtures/screenshot-test.js') ],
+      _instrumentCode: false,
+      _randomizeOutputDir: true
+    })
+
+    await fsStatAsync(imgPath)
+    await fsUnlinkAsync(imgPath)
     t.pass()
   } catch (err) {
     t.fail(err)
