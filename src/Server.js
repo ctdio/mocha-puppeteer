@@ -1,13 +1,11 @@
 const http = require('http')
 const EventEmitter = require('events')
 
-const Koa = require('koa')
-const bodyParser = require('koa-bodyparser')
-const serve = require('koa-static')
-const mount = require('koa-mount')
-const Router = require('koa-path-router')
+const express = require('express')
+const bodyParser = require('body-parser')
 
 const marko = require('marko')
+const markoExpress = require('marko/express')
 const TestPage = marko.load(require('./pages/test-page'))
 
 const { Server: WebSocketServer } = require('ws')
@@ -16,31 +14,27 @@ class Server extends EventEmitter {
   constructor ({ outputDir, pageLasso, dependencies, testPage }) {
     super()
 
-    const app = this._app = new Koa()
-    const router = new Router({
-      middleware: [ bodyParser() ]
-    })
+    const app = this._app = express()
+    app.use(bodyParser.json())
+    app.use(markoExpress())
 
     testPage = (testPage && marko.load(testPage)) || TestPage
 
-    router.get('/', async (ctx) => {
+    app.get('/', (req, res) => {
       this.emit('start')
-      ctx.type = 'html'
 
-      ctx.body = testPage.stream({
+      res.marko(testPage, {
         lasso: pageLasso,
         dependencies
       })
-
-      ctx.body.on('error', console.error)
     })
 
-    router.post('/end-test', async (ctx) => {
+    app.post('/end-test', (req, res) => {
       const {
         errorMsg,
         testsPassed,
         coverageReport
-      } = ctx.request.body
+      } = req.body
 
       this.emit('end', {
         errorMsg,
@@ -49,11 +43,10 @@ class Server extends EventEmitter {
       })
 
       // return empty response as ack
-      ctx.body = {}
+      res.send({})
     })
 
-    app.use(router.getRequestHandler())
-    app.use(mount('/static', serve(outputDir)))
+    app.use('/static', express.static(outputDir))
   }
 
   getPort () {
@@ -68,8 +61,8 @@ class Server extends EventEmitter {
 
   async listen () {
     return new Promise((resolve) => {
-      const httpServer = this._server = http.createServer(this._app.callback())
-        .listen(async () => {
+      const httpServer = this._server = http.createServer(this._app)
+        .listen(() => {
           const { port } = httpServer.address()
           this._port = port
 
