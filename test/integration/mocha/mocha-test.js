@@ -1,4 +1,4 @@
-const { promisify } = require('util')
+const { promisify } = require('bluebird')
 const fs = require('fs')
 const path = require('path')
 const fsUnlinkAsync = promisify(fs.unlink)
