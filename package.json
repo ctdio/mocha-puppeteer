@@ -25,6 +25,7 @@
   "dependencies": {
     "argly": "^1.2.0",
     "babel-plugin-istanbul": "^4.1.4",
+    "babel-polyfill": "^6.26.0",
     "bluebird": "^3.5.0",
     "body-parser": "^1.18.2",
     "express": "^4.15.4",
