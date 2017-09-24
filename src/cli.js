@@ -1,11 +1,12 @@
+require('babel-polyfill')
 require('marko/node-require').install()
 
 const argly = require('argly')
 const resolveFrom = require('resolve-from')
 const mochaPuppeteer = require('./index')
-const _loadConfig = require('./src/utils/loadConfig')
+const _loadConfig = require('./utils/loadConfig')
 
-const mochaPuppeteerPkgVersion = require('./package.json').version
+const mochaPuppeteerPkgVersion = require('../package.json').version
 
 function _resolveTestPage (testPagePath) {
   try {

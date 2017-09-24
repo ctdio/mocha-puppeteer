@@ -1,0 +1,16 @@
+.editorconfig
+.eslintignore
+.travis.yml
+.eslintrc.yml
+.babelrc
+
+src/
+test/
+
+.cache/
+.githooks/
+.nyc_output/
+coverage/
+.mocha-puppeteer*/
+
+*.marko.js

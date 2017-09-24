@@ -1,4 +1,5 @@
-const TestRunner = require('./src/TestRunner')
+require('babel-polyfill')
+const TestRunner = require('./TestRunner')
 
 exports.runTests = async function (options) {
   return new Promise(async (resolve, reject) => {

@@ -1,8 +1,9 @@
 node_modules/
 .cache/
-static/
 coverage/
+.nyc_output/
 
 .mocha-puppeteer*
 
 *.marko.js
+lib/

@@ -19,7 +19,7 @@ test.beforeEach('setup testConfig', (t) => {
 })
 
 async function _testLoadConfig ({ t, mockConfigPath, testConfig, expected }) {
-  const loadConfig = proxyquire('~/src/utils/loadConfig', {
+  const loadConfig = proxyquire('~/lib/utils/loadConfig', {
     fs: {
       access (path, mode, callback) {
         if (path === mockConfigPath) {
@@ -80,7 +80,7 @@ test('should throw an error if failed to load config', async (t) => {
   const mockConfigPath = `${TEST_CWD}/${CONFIG_NAME}`
 
   // don't expose the config as a module
-  const loadConfig = proxyquire('~/src/utils/loadConfig', {
+  const loadConfig = proxyquire('~/lib/utils/loadConfig', {
     fs: {
       access (path, mode, callback) {
         if (path === mockConfigPath) {

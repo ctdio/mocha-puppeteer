@@ -4,7 +4,7 @@ const path = require('path')
 const fsUnlinkAsync = promisify(fs.unlink)
 const fsStatAsync = promisify(fs.stat)
 const test = require('ava')
-const { runTests } = require('~/index')
+const { runTests } = require('~/lib/index')
 
 test('#runTests should resolve for passing tests', async (t) => {
   try {

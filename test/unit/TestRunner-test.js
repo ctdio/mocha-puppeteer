@@ -63,7 +63,7 @@ test.beforeEach('setup mocks and test runner', (t) => {
     create () {}
   }
 
-  const TestRunner = proxyquire('~/src/TestRunner', {
+  const TestRunner = proxyquire('~/lib/TestRunner', {
     puppeteer: mockPuppeteer,
     fs: mockFs
   })
@@ -186,7 +186,7 @@ test('should call puppeteer launch with puppeteerLaunchOptions', async (t) => {
     mockFs
   } = t.context
 
-  const TestRunner = proxyquire('~/src/TestRunner', {
+  const TestRunner = proxyquire('~/lib/TestRunner', {
     puppeteer: mockPuppeteer,
     fs: mockFs
   })
@@ -217,7 +217,7 @@ test('should call \'page.goto\' with puppeteerPageOptions', async (t) => {
     mockPage
   } = t.context
 
-  const TestRunner = proxyquire('~/src/TestRunner', {
+  const TestRunner = proxyquire('~/lib/TestRunner', {
     puppeteer: mockPuppeteer,
     fs: mockFs
   })
@@ -315,7 +315,7 @@ test('should call fs.mkdir and fs.writeFile upon completing a test if ' +
   const mkdirSpy = sandbox.spy(mockFs, 'mkdir')
   const writeFileSpy = sandbox.spy(mockFs, 'writeFile')
 
-  const TestRunner = proxyquire('~/src/TestRunner', {
+  const TestRunner = proxyquire('~/lib/TestRunner', {
     puppeteer: mockPuppeteer,
     fs: mockFs
   })
@@ -356,7 +356,7 @@ test('should not call fs.mkdir and fs.writeFile upon completing a test if ' +
   const mkdirSpy = sandbox.spy(mockFs, 'mkdir')
   const writeFileSpy = sandbox.spy(mockFs, 'writeFile')
 
-  const TestRunner = proxyquire('~/src/TestRunner', {
+  const TestRunner = proxyquire('~/lib/TestRunner', {
     puppeteer: mockPuppeteer,
     fs: mockFs
   })
@@ -396,7 +396,7 @@ test('should still write coverage file if mkdir throws an error code ' +
   sandbox.stub(mockFs, 'mkdir').throws(testError)
   const writeFileSpy = sandbox.spy(mockFs, 'writeFile')
 
-  const TestRunner = proxyquire('~/src/TestRunner', {
+  const TestRunner = proxyquire('~/lib/TestRunner', {
     puppeteer: mockPuppeteer,
     fs: mockFs
   })
@@ -437,7 +437,7 @@ test('should still write coverage file if mkdir throws an error code ' +
   sandbox.stub(mockFs, 'mkdir').throws(testError)
   const writeFileSpy = sandbox.spy(mockFs, 'writeFile')
 
-  const TestRunner = proxyquire('~/src/TestRunner', {
+  const TestRunner = proxyquire('~/lib/TestRunner', {
     puppeteer: mockPuppeteer,
     fs: mockFs
   })
