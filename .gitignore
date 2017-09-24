@@ -9,3 +9,5 @@ test/integration/mocha/static/*
 
 .nyc_output/
 coverage/
+
+lib/

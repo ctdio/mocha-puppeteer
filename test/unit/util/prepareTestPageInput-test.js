@@ -36,7 +36,7 @@ test.beforeEach((t) => {
 
   const mockLasso = sandbox.mock(lasso)
 
-  const prepareTestPageInput = proxyquire('~/src/utils/prepareTestPageInput', {
+  const prepareTestPageInput = proxyquire('~/lib/utils/prepareTestPageInput', {
     lasso
   })
 
@@ -145,10 +145,10 @@ test('should resolve relative input dependencies', (t) => {
   const { prepareTestPageInput } = t.context
 
   const lassoDependencies = [
-    'require: ./src/TestRunner'
+    'require: ./lib/TestRunner'
   ]
 
-  const expectedPath = `${process.cwd()}/src/TestRunner.js`
+  const expectedPath = `${process.cwd()}/lib/TestRunner.js`
 
   const { dependencies } = prepareTestPageInput({
     testFiles: [],
@@ -164,11 +164,11 @@ test('should resolve relative input dependencies defined in object form', (t) =>
   const lassoDependencies = [
     {
       type: 'require',
-      path: './src/TestRunner'
+      path: './lib/TestRunner'
     }
   ]
 
-  const expectedPath = `${process.cwd()}/src/TestRunner.js`
+  const expectedPath = `${process.cwd()}/lib/TestRunner.js`
 
   const { dependencies } = prepareTestPageInput({
     testFiles: [],
@@ -184,9 +184,9 @@ test('should resolve relative input dependencies defined in object form', (t) =>
 test('should resolve relative input dependencies defined in object form', (t) => {
   const { prepareTestPageInput } = t.context
 
-  const lassoDependencies = [ './src/TestRunner' ]
+  const lassoDependencies = [ './lib/TestRunner' ]
 
-  const expectedPath = `${process.cwd()}/src/TestRunner.js`
+  const expectedPath = `${process.cwd()}/lib/TestRunner.js`
 
   const { dependencies } = prepareTestPageInput({
     testFiles: [],

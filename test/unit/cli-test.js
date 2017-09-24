@@ -56,9 +56,9 @@ function _prepareArgumentParser (options) {
     }
   }
 
-  return proxyquire('~/cli', {
+  return proxyquire('~/lib/cli', {
     './index': { runTests: runTestsFunc },
-    './src/utils/loadConfig': loadConfigFunc,
+    './utils/loadConfig': loadConfigFunc,
     'argly': { createParser: () => parser }
   })
 }
@@ -329,11 +329,11 @@ test('should allow passing valid Marko template path', async (t) => {
     sandbox,
     parseOutput: {
       pattern: TEST_PATTERN,
-      testPagePath: path.resolve(__dirname, '../../src/pages/test-page/index.marko')
+      testPagePath: path.resolve(__dirname, '../../lib/pages/test-page/index.marko')
     },
     loadConfigFunc: loadConfigSpy,
     runTestsFunc (options) {
-      t.deepEqual(options.testPage, require('~/src/pages/test-page/index.marko'))
+      t.deepEqual(options.testPage, require('~/lib/pages/test-page/index.marko'))
     }
   })
 

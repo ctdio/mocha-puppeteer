@@ -2,20 +2,26 @@
   "name": "mocha-puppeteer",
   "version": "0.11.0",
   "description": "Run tests in headless chrome",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "author": "Charlie Duong",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/charlieduong94/mocha-puppeteer"
+  },
   "bin": {
     "mocha-puppeteer": "./bin/mocha-puppeteer"
   },
   "scripts": {
     "lint": "eslint .",
-    "pretest": "npm run lint",
+    "pretest": "npm run lint && npm run transpile",
     "test": "nyc ava",
     "test:unit": "nyc ava test/unit",
     "test:integration": "nyc ava test/integration",
-    "coverage": "nyc report --reporter=text-lcov | coveralls"
+    "transpile": "babel src --out-dir lib --copy-files",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "prepare": "npm run transpile"
   },
-  "author": "Charlie Duong",
-  "license": "MIT",
   "dependencies": {
     "argly": "^1.2.0",
     "babel-plugin-istanbul": "^4.1.4",
@@ -27,13 +33,15 @@
     "lasso-babel-transform": "^1.0.1",
     "marko": "^4.4.26",
     "mocha": "^3.5.0",
-    "puppeteer": "^0.9.0",
+    "puppeteer": "^0.11.0",
     "rimraf": "^2.6.1",
     "superagent": "^3.6.0",
     "uuid": "^3.1.0"
   },
   "devDependencies": {
     "ava": "^0.22.0",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.0",
     "coveralls": "^2.13.1",
     "eslint": "^4.5.0",
     "eslint-config-standard": "^10.2.1",
@@ -49,11 +57,14 @@
     "sinon": "^3.2.1"
   },
   "ava": {
+    "babel": "inherit",
     "files": [
       "test/**/*.js",
       "!test/util/**/*.js"
     ],
     "require": [
+      "babel-polyfill",
+      "babel-register",
       "require-self-ref"
     ]
   }
