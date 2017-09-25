@@ -8,5 +8,8 @@
         }
       }
     ]
+  ],
+  "ignore": [
+    "src/pages/test-page/run-tests.js"
   ]
 }
