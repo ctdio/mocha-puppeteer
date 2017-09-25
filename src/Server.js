@@ -15,7 +15,7 @@ class Server extends EventEmitter {
     super()
 
     const app = this._app = express()
-    app.use(bodyParser.json())
+    app.use(bodyParser.json({ limit: '100mb' }))
     app.use(markoExpress())
 
     testPage = (testPage && marko.load(testPage)) || TestPage
