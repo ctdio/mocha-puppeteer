@@ -34,7 +34,7 @@
     "lasso-babel-transform": "^1.0.1",
     "marko": "^4.4.26",
     "mocha": "^3.5.0",
-    "puppeteer": "^0.11.0",
+    "puppeteer": "^0.12.0",
     "rimraf": "^2.6.1",
     "superagent": "^3.6.0",
     "uuid": "^3.1.0"
