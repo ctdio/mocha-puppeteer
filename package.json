@@ -1,6 +1,6 @@
 {
   "name": "mocha-puppeteer",
-  "version": "0.12.3",
+  "version": "0.12.4",
   "description": "Run tests in headless chrome",
   "main": "lib/index.js",
   "author": "Charlie Duong",
