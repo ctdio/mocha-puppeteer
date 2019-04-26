@@ -85,6 +85,10 @@ const parser = argly
     '--puppeteerPageTimeout': {
       type: 'number',
       description: 'Maximum time in milliseconds to wait for the page to load'
+    },
+    '--devtools': {
+      type: 'boolean',
+      description: 'Turn on the Developer Tools support. Useful for debugging using the "debugger" keyword in your tests.'
     }
   })
   .example('Test a single file: "mocha-puppeteer /foo/bar-test.js"')
@@ -124,7 +128,8 @@ module.exports = async function runCli () {
     dumpio,
     userDataDir,
     puppeteerPageTimeout,
-    testPagePath
+    testPagePath,
+    devtools
   } = parser.parse()
 
   // Gracefully exit if either the "help" or "version" arguments are supplied
@@ -174,7 +179,8 @@ module.exports = async function runCli () {
         handleSIGINT,
         timeout: puppeteerTimeout,
         dumpio,
-        userDataDir
+        userDataDir,
+        devtools
       },
       puppeteerPageOptions: {
         timeout: puppeteerPageTimeout
